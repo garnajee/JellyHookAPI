@@ -43,7 +43,7 @@ def send_whatsapp(phone, message, send_image=False, picture_path=None):
     response = requests.post(url, headers=headers, data=data, auth=auth, files=files if send_image else None)
     return response
 
-def format_message(title, overview, imdb, tmdb, vidt, send_image=True):
+def format_message(title, overview, imdb, tmdb, vidt):
     message = f'*{title}*\n'
 
     if overview:
@@ -304,8 +304,9 @@ def receive_data():
             # If it's an episode added message, do not send an image
             send_image = False
 
-        message = format_message(title, overview, imdb, tmdb, vidt, send_image)
+        message = format_message(title, overview, imdb, tmdb, vidt)
     else:
+        # this is a season added message
         send_image = False
         message = f'*{title}*'
 
