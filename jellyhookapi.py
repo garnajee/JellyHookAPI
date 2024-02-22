@@ -211,6 +211,8 @@ def receive_data():
   imdb = data.get('imdb', '')
   tmdb = data.get('tmdb', '')
 
+  poster_path = None
+
   if is_season_ep_or_movie(media_type,title) == "movie":
     # It's a movie
     tmdb_details = get_tmdb_details(media_type, tmdb, language=LANGUAGE)
