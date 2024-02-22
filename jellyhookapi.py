@@ -245,11 +245,14 @@ def receive_data():
     # serie_name
     # remove "Episode-added: "
     title = re.search(r"Episode-added:\s*(.*)", title, flags=re.IGNORECASE).group(1)
-    # get epidode links (imdb + tmdb)
-    imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
-    # imdb to tmdb
-    tmdb_link = f"• TMDb: {imdb_to_tmdb(imdb)}"
-    media_link = imdb_link + "\n" + tmdb_link
+    if imdb != '':
+        # get epidode links (imdb + tmdb)
+        imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
+        # imdb to tmdb
+        tmdb_link = f"• TMDb: {imdb_to_tmdb(imdb)}"
+        media_link = imdb_link + "\n" + tmdb_link
+    else:
+        media_link = ""
     # send message
     fmessage = format_message(title, "", media_link, "")
     send_whatsapp(WHATSAPP_NUMBER, fmessage, False, None)
