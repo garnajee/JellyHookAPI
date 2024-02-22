@@ -235,7 +235,7 @@ def receive_data():
     # season number
     season_number = re.search(r", Saison\s*([0-9]+)", title, flags=re.IGNORECASE).group(1)
     # final title
-    title = season_name + ", Saison" + season_number + " a été ajouté"
+    title = season_name + ", Saison " + season_number
     # send message
     fmessage = format_message(title, "", "", "")
     send_whatsapp(WHATSAPP_NUMBER, fmessage, False, None)
