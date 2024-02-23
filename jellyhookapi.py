@@ -217,6 +217,9 @@ def receive_data():
     # It's a movie
     tmdb_details = get_tmdb_details(media_type, tmdb, language=LANGUAGE)
     title = tmdb_details.get('title', '')
+    release_date = tmdb_details.get('release_date', '')
+    # add year of release if exists
+    formatted_title = f"{title} ({release_date.split('-')[0]})" if release_date else title
     overview = tmdb_details.get('overview', '')
     poster_id = tmdb_details.get('poster_path', '')
     poster_path = download_and_get_poster_by_id(poster_id)
@@ -224,7 +227,7 @@ def receive_data():
     imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
     tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}"
     media_link = imdb_link + "\n" + tmdb_link
-    fmessage = format_message(title, overview, media_link, trailer)
+    fmessage = format_message(formatted_title, overview, media_link, trailer)
     send_whatsapp(WHATSAPP_NUMBER, fmessage, True, poster_path)
   elif is_season_ep_or_movie(media_type,title) == "season":
     # It's a season
@@ -268,6 +271,9 @@ def receive_data():
       # overview, poster, trailer, media_link
       tmdb_details = get_tmdb_details(media_type, tmdb, language=LANGUAGE)
       title = tmdb_details.get('name', '')
+      release_date = tmdb_details.get('release_date', '')
+      # add year of release if exists
+      formatted_title = f"{title} ({release_date.split('-')[0]})" if release_date else title
       overview = tmdb_details.get('overview', '')
       poster_id = tmdb_details.get('poster_path', '')
       poster_path = download_and_get_poster_by_id(poster_id)
@@ -281,7 +287,7 @@ def receive_data():
           tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}"
       media_link = imdb_link + "\n" + tmdb_link
       # send message    
-      fmessage = format_message(title, overview, media_link, trailer)
+      fmessage = format_message(formatted_title, overview, media_link, trailer)
       send_whatsapp(WHATSAPP_NUMBER, fmessage, True, poster_path)
 
   if poster_path:
