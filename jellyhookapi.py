@@ -271,7 +271,7 @@ def receive_data():
       # overview, poster, trailer, media_link
       tmdb_details = get_tmdb_details(media_type, tmdb, language=LANGUAGE)
       title = tmdb_details.get('name', '')
-      release_date = tmdb_details.get('release_date', '')
+      release_date = tmdb_details.get('first_air_date', '')
       # add year of release if exists
       formatted_title = f"{title} ({release_date.split('-')[0]})" if release_date else title
       overview = tmdb_details.get('overview', '')
