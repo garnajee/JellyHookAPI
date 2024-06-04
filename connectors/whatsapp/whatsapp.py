@@ -3,6 +3,7 @@
 import requests
 import os
 from dotenv import load_dotenv
+import logging
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
@@ -27,15 +28,22 @@ def send_whatsapp_message(message: str, send_image: bool = False, picture_path: 
     auth = (WHATSAPP_API_USERNAME, WHATSAPP_API_PWD)
     headers = {'accept': 'application/json'}
     data = {'phone': WHATSAPP_NUMBER}
-    if send_image:
-        data['caption'] = message
-        data['compress'] = "True"
-        files = {'image': ('image', open(picture_path, 'rb'), 'image/png')}
-        response = requests.post(url, headers=headers, data=data, auth=auth, files=files)
-    else:
-        data['message'] = message
-        response = requests.post(url, headers=headers, data=data, auth=auth)
-    return response
+
+    try:
+        if send_image and picture_path:
+            data['caption'] = message
+            data['compress'] = "True"
+            files = {'image': ('image', open(picture_path, 'rb'), 'image/png')}
+            response = requests.post(url, headers=headers, data=data, auth=auth, files=files)
+        else:
+            data['message'] = message
+            response = requests.post(url, headers=headers, data=data, auth=auth)
+        
+        response.raise_for_status()
+        return response
+    except requests.RequestException as e:
+        logging.error(f"Error sending WhatsApp message: {e}")
+        return None
 
 if __name__ == "__main__":
     message = "Test message"
