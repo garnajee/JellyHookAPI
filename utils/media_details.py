@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import requests
 import re
+import logging
 from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL
 
 def get_tmdb_details(media_type: str, tmdbid: int, language: str = LANGUAGE) -> dict:
