@@ -2,6 +2,7 @@
 
 import requests
 import tempfile
+import logging
 
 def download_and_get_poster_by_id(poster_id: str) -> str:
     """
@@ -14,11 +15,16 @@ def download_and_get_poster_by_id(poster_id: str) -> str:
         str: Path to the downloaded poster.
     """
     poster_url = f"https://image.tmdb.org/t/p/w342/{poster_id}"
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
-        response = requests.get(poster_url)
-        temp.write(response.content)
-        temp_path = temp.name
-    return temp_path
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
+            response = requests.get(poster_url)
+            response.raise_for_status()
+            temp.write(response.content)
+            temp_path = temp.name
+        return temp_path
+    except requests.RequestException as e:
+        logging.error(f"Error downloading poster: {e}")
+        return ""
 
 if __name__ == "__main__":
     poster_id = "t1i10ptOivG4hV7erkX3tmKpiqm.jpg"
