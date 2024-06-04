@@ -6,8 +6,11 @@ from utils.download import download_and_get_poster_by_id
 from integrations.whatsapp.whatsapp import send_whatsapp_message
 import os
 import re
+import logging
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 @app.route('/api', methods=['POST'])
 def receive_data():
@@ -18,7 +21,12 @@ def receive_data():
     media_type = data.get('media_type', '')
     title = data.get('title', '')
     imdb = data.get('imdb', '')
-    tmdb = int(data.get('tmdb', ''))
+    tmdb = data.get('tmdb', '')
+
+    try:
+        tmdb = int(tmdb) if tmdb else None
+    except ValueError:
+        return jsonify({'message': 'Invalid TMDB ID!'}), 400
 
     poster_path = None
 
