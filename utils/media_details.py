@@ -1,15 +1,7 @@
 #!/usr/bin/env python3
 import requests
 import re
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-TMDB_API_KEY = os.getenv("TMDB_API_KEY")
-LANGUAGE = os.getenv("LANGUAGE")
-LANGUAGE2 = os.getenv("LANGUAGE2")
-BASE_URL = "https://api.themoviedb.org/3"
+from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL
 
 def get_tmdb_details(media_type: str, tmdbid: int, language: str = LANGUAGE) -> dict:
     """
