@@ -9,9 +9,9 @@ services:
       - .env
     volumes:
       - .:/app
-    command: sh -c "pip install --no-cache-dir -r requirements.txt && python jellysookapi.py"
+    command: sh -c "pip install --no-cache-dir -r requirements.txt && python app.py"
     ports:
-      - "0.0.0.0:7778:7778"
+      - ${DOCKER_BIND_ADDR}:${DOCKER_PORT}:7778
 #    networks:
 #      net-chill:
 #        ipv4_address: 10.10.66.198
