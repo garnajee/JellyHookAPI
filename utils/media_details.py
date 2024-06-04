@@ -20,8 +20,13 @@ def get_tmdb_details(media_type: str, tmdbid: int, language: str = LANGUAGE) -> 
         'api_key': TMDB_API_KEY,
         'language': language,
     }
-    response = requests.get(url, params=params, timeout=10)
-    return response.json()
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        logging.error(f"Error fetching TMDB details: {e}")
+        return {}
 
 def imdb_to_tmdb(imdb_id: str) -> str:
     """
@@ -44,8 +49,8 @@ def imdb_to_tmdb(imdb_id: str) -> str:
             return f"https://tmdb.org/tv/{results['tv_results'][0]['id']}"
         elif "tv_episode_results" in results and results["tv_episode_results"]:
             return f"https://tmdb.org/tv/episode/{results['tv_episode_results'][0]['id']}"
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+    except requests.RequestException as e:
+        logging.error(f"Error fetching TMDB link from IMDb ID: {e}")
     return None
 
 def get_trailer_link(media_type: str, tmdbid: int) -> str:
@@ -101,8 +106,8 @@ def search_trailer_key(vidt: str, language: str, pattern: str) -> str:
             for video in results:
                 if re.search(pattern, video.get("name", ""), flags=re.IGNORECASE):
                     return video.get("key")
-    except requests.exceptions.RequestException as e:
-        print(f"search_trailer_key request error: {e}")
+    except requests.RequestException as e:
+        logging.error(f"Error fetching trailer key: {e}")
     return None
 
 def is_season_ep_or_movie(media_type: str, title: str) -> str:
