@@ -4,7 +4,6 @@ import re
 import os
 from dotenv import load_dotenv
 
-# Charger les variables d'environnement globales
 load_dotenv()
 
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
