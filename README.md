@@ -1,24 +1,16 @@
 <br/>
 <p align="center">
-  <img src="path/to/logo.png" alt="JellyHookAPI Logo" width="200">
-
+  <img src="logo.png" alt="JellyHookAPI Logo" width="250px" height="250px">
   <h2 align="center">JellyHookAPI</h2>
-
 </p>
-
 <p align="center">
-  <a href="https://github.com/your-repo/issues/new?template=bug_report.md">
-    <img src="https://img.shields.io/badge/report-issue-red" alt="Report Issue">
-  </a>
+  <a href="https://github.com/your-repo/issues/new?template=bug_report.md"><img src="https://img.shields.io/badge/report-issue-red" alt="Report Issue"></a> 
   <a href="https://github.com/your-repo/issues/new?template=feature_request.md">
-    <img src="https://img.shields.io/badge/request-feature-brightgreen" alt="Request Feature">
-  </a>
-  <a href="https://img.shields.io/github/issues/garnajee/JellyhookAPI">
-    <img src="https://img.shields.io/github/issues/garnajee/JellyhookAPI" alt="Issues">
-  </a>
-  <a href="https://img.shields.io/github/license/garnajee/JellyHookAPI">
-    <img src="https://img.shields.io/github/license/garnajee/JellyHookAPI" alt="License">
-  </a>
+  <img src="https://img.shields.io/badge/request-feature-fuchsia" alt="Request Feature"></a>
+  <br/>
+  <img src="https://img.shields.io/github/contributors/garnajee/JellyHookAPI?color=dark-green" alt="Contributors">
+  <img src="https://img.shields.io/github/issues/garnajee/JellyHookAPI" alt="Issues">
+  <img src="https://img.shields.io/github/license/garnajee/JellyHookAPI?color=blue" alt="License">
 </p>
 
 ---
