@@ -13,11 +13,11 @@
   <a href="https://github.com/your-repo/issues/new?template=feature_request.md">
     <img src="https://img.shields.io/badge/request-feature-brightgreen" alt="Request Feature">
   </a>
-  <a href="https://img.shields.io/github/issues/your-repo">
-    <img src="https://img.shields.io/github/issues/your-repo" alt="Issues">
+  <a href="https://img.shields.io/github/issues/garnajee/JellyhookAPI">
+    <img src="https://img.shields.io/github/issues/garnajee/JellyhookAPI" alt="Issues">
   </a>
-  <a href="https://img.shields.io/github/license/your-repo">
-    <img src="https://img.shields.io/github/license/your-repo" alt="License">
+  <a href="https://img.shields.io/github/license/garnajee/JellyHookAPI">
+    <img src="https://img.shields.io/github/license/garnajee/JellyHookAPI" alt="License">
   </a>
 </p>
 
