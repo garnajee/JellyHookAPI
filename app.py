@@ -13,6 +13,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 CONNECTORS_DIR = 'connectors'
 
 def load_connectors():
+    """
+    Load connectors dynamically from the connectors directory.
+
+    Returns:
+        dict: Dictionary of connectors.
+    """
     connectors = {}
     for root, dirs, files in os.walk(CONNECTORS_DIR):
         for file in files:
@@ -27,6 +33,12 @@ connectors = load_connectors()
 
 @app.route('/api', methods=['POST'])
 def receive_data():
+    """
+    Endpoint to receive and process incoming data.
+
+    Returns:
+        Response: JSON response indicating success or failure.
+    """
     if not request.is_json:
         return jsonify({'message': 'Data is not json!'}), 400
 
