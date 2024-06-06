@@ -68,7 +68,6 @@ Usgin `git`:
 
 ```sh
 git clone https://github.com/garnajee/JellyHookAPI.git
-cd JellyHookAPI
 ```
 
 Or using `cURL`:
