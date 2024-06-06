@@ -26,7 +26,10 @@ cp ../template/.env.template .env
 
 ### 3. Implement the Connector
 
-Create a Python script with the following name: `myConnector_service.py`. **The script name must end with `_service.py`.**
+Create a Python script with the following name: `myConnector_service.py`. 
+
+> [!WARNING]
+> **The script name must end with `_service.py`.**
 
 This script should contain the implementation of the connector. Use the template provided in the `template` directory.
 
