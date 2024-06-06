@@ -4,8 +4,8 @@
   <h2 align="center">JellyHookAPI</h2>
 </p>
 <p align="center">
-  <a href="https://github.com/your-repo/issues/new?template=bug_report.md"><img src="https://img.shields.io/badge/report-issue-red" alt="Report Issue"></a> 
-  <a href="https://github.com/your-repo/issues/new?template=feature_request.md">
+  <a href="https://github.com/garnajee/JellyHookAPI/issues/new?template=bug_report.md"><img src="https://img.shields.io/badge/report-issue-red" alt="Report Issue"></a> 
+  <a href="https://github.com/garnajee/JellyHookAPI/issues/new?template=feature_request.md">
   <img src="https://img.shields.io/badge/request-feature-fuchsia" alt="Request Feature"></a>
   <br/>
   <img src="https://img.shields.io/github/contributors/garnajee/JellyHookAPI?color=dark-green" alt="Contributors">
