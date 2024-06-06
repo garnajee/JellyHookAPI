@@ -12,18 +12,10 @@ WHATSAPP_NUMBER = os.getenv("WHATSAPP_NUMBER")
 WHATSAPP_API_USERNAME = os.getenv("WHATSAPP_API_USERNAME")
 WHATSAPP_API_PWD = os.getenv("WHATSAPP_API_PWD")
 
-def send_whatsapp_message(message: str, send_image: bool = False, picture_path: str = None) -> requests.Response:
-    """
-    Send a message to WhatsApp API.
+def send_message(message: str, options: dict = {}) -> requests.Response:
+    send_image = options.get('send_image', False)
+    picture_path = options.get('picture_path', None)
 
-    Args:
-        message (str): Message to be sent.
-        send_image (bool, optional): Whether to send an image. Defaults to False.
-        picture_path (str, optional): Path to the image file. Defaults to None.
-
-    Returns:
-        requests.Response: Response from the WhatsApp API.
-    """
     url = f"{WHATSAPP_API_URL}/send/image" if send_image else f"{WHATSAPP_API_URL}/send/message"
     auth = (WHATSAPP_API_USERNAME, WHATSAPP_API_PWD)
     headers = {'accept': 'application/json'}
@@ -38,12 +30,13 @@ def send_whatsapp_message(message: str, send_image: bool = False, picture_path: 
         else:
             data['message'] = message
             response = requests.post(url, headers=headers, data=data, auth=auth)
-        
+
         response.raise_for_status()
         return response
     except requests.RequestException as e:
         logging.error(f"Error sending WhatsApp message: {e}")
         return None
+
 
 if __name__ == "__main__":
     message = "Test message"
