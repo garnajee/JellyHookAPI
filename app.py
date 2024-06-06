@@ -21,6 +21,9 @@ def load_connectors():
     """
     connectors = {}
     for root, dirs, files in os.walk(CONNECTORS_DIR):
+        # Skip the template directory
+        if 'template' in root.split(os.sep):
+            continue
         for file in files:
             if file.endswith('_service.py'):
                 connector_name = root.split(os.sep)[-1]
