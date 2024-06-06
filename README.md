@@ -1,107 +1,151 @@
-## JellyHookAPI Docker Compose Setup
+<br/>
+<p align="center">
+  <img src="path/to/logo.png" alt="JellyHookAPI Logo" width="200">
 
-This docker-compose setup provides a straightforward way to deploy `jellyhookapi`, a Flask application that serves as a webhook receiver for Jellyfin media server notifications. Here's how to get it running and configured:
+  <h2 align="center">JellyHookAPI</h2>
 
-### Prerequisites
+</p>
 
-- Docker, and docker-compose or the compose plugin installed on your system.
-
-### Getting Started
-
-1. Clone this repository to your local machine or download it using `cURL` or `wget`:
-
-```bash
-# using cURL
-$ curl -LOk https://github.com/garnajee/JellyHookAPI/archive/master.tar.gz
-
-# using wget
-$ wget https://github.com/garnajee/JellyHookAPI/archive/master.tar.gz
-
-# extract content
-$ tar xvzf master.tar.gz
-```
-
-2. Ensure you have a `.env` file in the root directory with the required environment variables (see below for details).
-3. Modify the Jellyfin server configuration to send notifications to the webhook URL provided by `jellyhookapi`.
-
-### Docker Compose Configuration
-
-The `docker-compose.yml` file specifies the following configurations:
-
-- **Container Name**: `jellyhookapi`.
-- **Restart Policy**: Always.
-- **Image**: Python Alpine.
-- **Working Directory**: `/app`.
-- **Environment Variables**: Loaded from the `.env` file.
-- **Volumes**: Maps the current directory to `/app` in the container.
-- **Command**: Installs dependencies and starts the `jellyhookapi.py` script.
-- **Ports**: Maps port `7778` on the host to port `7778` in the container. You can change it to fit your configuration.
-
-### Environment Variables
-
-Make sure your `.env` file includes the following variables:
-
-- `TMDB_API_KEY`: Your TMDB API key.
-- `LANGUAGE`: Main language for media details.
-- `LANGUAGE2`: Secondary language for trailers.
-- `WHATSAPP_API_URL`: URL for your WhatsApp API.
-- `WHATSAPP_NUMBER`: Your WhatsApp number or group ID.
-- `WHATSAPP_API_USERNAME`: Username for WhatsApp API.
-- `WHATSAPP_API_PWD`: Password for WhatsApp API.
-
-### Running the Docker Compose
-
-To start the Docker Compose setup, run the following command in the root directory of the repository:
-
-```bash
-$ sudo docker-compose up -d
-```
-
-### Jellyfin Configuration
-
-In your Jellyfin Web UI:
-
-1. Go to **Extensions** > **Webhook** > **Add Generic Destination**.
-2. Fill in the following details:
-   - **Webhook Name**: Choose a name.
-   - **Webhook URL**: Use the URL provided by `jellyhookapi` (Depending your docker network configuraion)
-   - **Notification Type**: Select **Item Added**.
-   - **Template**: Use the provided code: 
-
-```
-{
-  "media_type": "
-    {{~#if_equals ItemType 'Movie'~}}
-      movie
-    {{~else~}}
-      tv
-    {{~/if_equals~}}",
-  "title": "
-    {{~#if_equals ItemType 'Season'~}}
-        Season-added: {{{SeriesName}}}, {{{Name}}}
-    {{~else~}}
-      {{~#if_equals ItemType 'Episode'~}}
-        Episode-added: {{{SeriesName}}}, S{{SeasonNumber00}}E{{EpisodeNumber00}} - {{{Name}}}
-        {{~else~}}
-          {{{Name}}} ({{Year}}) has been added
-      {{~/if_equals~}}
-    {{~/if_equals~}}
-    ",
-  "imdb": "{{Provider_imdb}}",
-  "tmdb": "{{Provider_tmdb}}",
-  "watch_link": "{{ServerUrl}}/web/index.html#!/details?id={{ItemId}}&serverId={{ServerId}}"
-}
-```
-
-3. Add a Request Header:
-   - **Key**: `Content-Type`.
-   - **Value**: `application/json`.
-4. Save your configuration.
-
-With these configurations in place, your Jellyfin server will send notifications to `jellyhookapi` upon media item additions.
+<p align="center">
+  <a href="https://github.com/your-repo/issues/new?template=bug_report.md">
+    <img src="https://img.shields.io/badge/report-issue-red" alt="Report Issue">
+  </a>
+  <a href="https://github.com/your-repo/issues/new?template=feature_request.md">
+    <img src="https://img.shields.io/badge/request-feature-brightgreen" alt="Request Feature">
+  </a>
+  <a href="https://img.shields.io/github/issues/your-repo">
+    <img src="https://img.shields.io/github/issues/your-repo" alt="Issues">
+  </a>
+  <a href="https://img.shields.io/github/license/your-repo">
+    <img src="https://img.shields.io/github/license/your-repo" alt="License">
+  </a>
+</p>
 
 ---
 
-Feel free to reach out if you encounter any issues or need further assistance!
+## Table of Contents
 
+1. [Introduction](#introduction)
+2. [Example](#example)
+3. [Supported Services](#supported-services)
+4. [Prerequisites](#prerequisites)
+5. [Installation](#installation)
+6. [Configuration](#configuration)
+7. [Contributing](#contributing)
+8. [License](#license)
+
+---
+
+## Introduction
+
+JellyHookAPI is a flexible and extensible API that allows you to receive notifications from [Jellyfin](https://github.com/jellyfin/jellyfin) and forward them to multiple third-party services (*connectors*). The system is designed to be dynamic, enabling easy addition of new connectors without modifying the core code.
+
+---
+
+## Example
+
+JellyHookAPI can receive media notifications and forward markdown-formatted messages with media details and trailers to services like WhatsApp. 
+
+For instance, when a new movie is added to your media server, after receivinge notification fron Jellyfin, JellyHookAPI can send a detailed message including the movie title, overview, IMDb and TMDb links, and trailer links to your preferred communication platforms.
+
+---
+
+## Supported Services
+
+Total Supported Services: **2**
+
+| Service  | Send Messages | Send Images |
+|----------|:-------------:|:-----------:|
+| WhatsApp | ✅            | ✅          |
+| *Soon*   | ✅            | ❌          |
+
+---
+
+## Prerequisites
+
+- Docker and Docker Compose
+- TMDB API Key ([it's free](https://www.themoviedb.org/signup))
+
+---
+
+## Installation
+
+### Clone the Repository
+
+Usgin `git`:
+
+```sh
+git clone https://github.com/garnajee/JellyHookAPI.git
+cd JellyHookAPI
+```
+
+Or using `cURL`:
+
+```sh
+curl -L https://github.com/garnajee/JellyHookAPI/archive/main.tar.gz -o JellyHookAPI.tar.gz
+tar xzf JellyHookAPI.tar.gz
+rm JellyHookAPI.tar.gz
+mv JellyHookAPI-main JellyHookAPI
+```
+
+Navigate to the folder:
+
+```sh
+cd JellyHookAPI
+```
+
+### Environment Setup
+
+Modify the `.env.example` file in the project root directory and add your configuration variables.
+
+```sh
+mv .env.example .env
+# Open it with your prefered editor to set the variables
+```
+
+### Docker Setup
+
+Ensure Docker and Docker Compose are installed. Use the following command to build and run the application:
+
+```sh
+docker-compose up -d
+```
+
+---
+
+## Configuration
+
+JellyHookAPI is designed to be extensible through connectors. Each connector is responsible for forwarding messages to a third-party service.
+
+### Example: Configuring WhatsApp Connector
+
+See this [README](connectors/README.md) for more informations.
+
+---
+
+## Contributing
+
+I'd be happy to welcome contributions to JellyHookAPI! To contribute:
+
+### Adding a New Connector
+
+1. **Fork the Repository**: Fork the repo on GitHub and clone your fork locally.
+2. **Create a Branch**: Create a new branch for your connector.
+3. **Add Your Connector**: Create a new folder in `connectors` and add your connector implementation.
+4. **Update Documentation**: Update the README in the new connector folder to include details of the new connector and its setup.
+5. **Pull Request**: Submit a pull request with a detailed description of your changes.
+
+### General Code Contributions
+
+1. **Fork the Repository**: Fork the repo on GitHub and clone your fork locally.
+2. **Create a Branch**: Create a new branch for your changes (`git checkout -b feature/AmazingFeature`)
+3. **Make Changes**: Make your changes, including documentation.
+4. **Push to the Branch**: Push your changes to the new branch (`git push origin feature/AmazingFeature`)
+5. **Pull Request**: Submit a pull request with a detailed description of your changes.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
