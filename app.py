@@ -68,5 +68,5 @@ def receive_data():
         return jsonify({'message': 'Internal server error'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=7778)
+    app.run(debug=False, host='0.0.0.0', port=7778)
 
