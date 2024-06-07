@@ -22,7 +22,7 @@ def load_connectors():
     connectors = {}
     for root, dirs, files in os.walk(CONNECTORS_DIR):
         # Skip the template directory
-        if 'template' in root.split(os.sep):
+        if "template" in root.split(os.sep):
             continue
         for file in files:
             if file.endswith('_service.py'):
@@ -59,7 +59,7 @@ def receive_data():
     try:
         if media_type and title:
             message, send_image, picture_path = handle_media(media_type, title, imdb, tmdb)
-            send_to_all_connectors(connectors, message, send_image, picture_path)
+            send_to_all_connectors(connectors, message, options)
             return jsonify({'message': 'Data received successfully!'})
         else:
             return jsonify({'message': 'Missing media_type or title!'}), 400
