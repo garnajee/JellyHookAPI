@@ -13,6 +13,16 @@ WHATSAPP_API_USERNAME = os.getenv("WHATSAPP_API_USERNAME")
 WHATSAPP_API_PWD = os.getenv("WHATSAPP_API_PWD")
 
 def send_message(message: str, options: dict = {}) -> requests.Response:
+    """
+    Send a message to WhatsApp API.
+
+    Args:
+        message (str): Message to be sent.
+        options (dict): Options specific to the API
+
+    Returns:
+        requests.Response: Response from the WhatsApp API.
+    """
     send_image = options.get('send_image', False)
     picture_path = options.get('picture_path', None)
 
