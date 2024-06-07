@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-  <img src="logo.png" alt="JellyHookAPI Logo" width="250px" height="250px">
+  <img src="logo.png" alt="JellyHookAPI Logo" width="250px" height="250px"/>
   <h2 align="center">JellyHookAPI</h2>
 </p>
 <p align="center">
