@@ -14,13 +14,13 @@ WHATSAPP_API_PWD = os.getenv("WHATSAPP_API_PWD")
 
 def format_message(message: dict) -> str:
     """
-    Formater le message pour WhatsApp.
+    Format message for WhatsApp
 
     Args:
-        message (dict): Le message à envoyer.
+        message (dict): Message to send.
 
     Returns:
-        str: Le message formaté pour WhatsApp.
+        str: Formatted message for WhatsApp.
     """
     formatted_message = f"*{message.get('title')}*\n"
     if message.get('description'):
@@ -36,7 +36,7 @@ def send_message(message: dict, options: dict = None) -> requests.Response:
     Send a message to WhatsApp API.
 
     Args:
-        message (dict): Message to be sent.
+        message (dict): Message to send.
         options (dict, optional): Options specific to the API
 
     Returns:
