@@ -49,6 +49,7 @@ Total Supported Services: **2**
 | Service  | Send Messages | Send Images |
 |----------|:-------------:|:-----------:|
 | WhatsApp | ✅            | ✅          |
+| Discord  | ✅            | ✅          |
 | *Soon*   | ✅            | ❌          |
 
 ---
