@@ -41,7 +41,7 @@ cp ../template/connector_template_service.py new_service.py
 
 The `send_message` function is responsible for sending the formatted message to the new service. It should take two arguments:
 
-- `message` (str): The message to be sent.
+- `message` (dict): The message to be sent.
 - `options` (dict): Additional options for the message (e.g., phone number, email address).
 
 The function should return the response from the service, which can be logged or used to handle errors.
