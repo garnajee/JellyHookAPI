@@ -38,7 +38,7 @@ JellyHookAPI is a flexible and extensible API that allows you to receive notific
 
 JellyHookAPI can receive media notifications and forward markdown-formatted messages with media details and trailers to services like WhatsApp. 
 
-For instance, when a new movie is added to your media server, after receivinge notification fron Jellyfin, JellyHookAPI can send a detailed message including the movie title, overview, IMDb and TMDb links, and trailer links to your preferred communication platforms.
+For instance, when a new movie is added to your media server, after receiving notification from Jellyfin, JellyHookAPI can send a detailed message including the movie title, overview, IMDb and TMDb links, and trailer links to your preferred communication platforms.
 
 ---
 
