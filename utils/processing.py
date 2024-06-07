@@ -5,46 +5,77 @@ import os
 from utils.media_details import get_tmdb_details, imdb_to_tmdb, get_trailer_link
 from utils.download import download_and_get_poster_by_id
 
-def handle_media(media_type: str, title: str, imdb: str, tmdb: int):
+def handle_media(data: dict) -> dict:
     """
-    Handle media processing based on type and title.
+    Manage media data and format the message.
 
     Args:
-        media_type (str): Type of media (movie, tv).
-        title (str): Title of the media.
-        imdb (str): IMDb ID of the media.
-        tmdb (int): TMDB ID of the media.
+        data (dict): The media data.
 
     Returns:
-        tuple: Formatted message (str), send_image flag (bool), path to poster (str).
+        dict: The formatted message and options.
+
     """
-    poster_path = None
+    media_type = data.get('media_type', '')
+    title = data.get('title', '')
+    imdb = data.get('imdb', '')
+    tmdb = data.get('tmdb', '')
+
+    message = {}
+    send_image = False
+    picture_path = None
 
     if is_season_ep_or_movie(media_type, title) == "movie":
-        tmdb_details = get_tmdb_details(media_type, tmdb)
-        formatted_title = format_title(tmdb_details.get('title', ''), tmdb_details.get('release_date', ''))
+        # It's a movie
+        tmdb_details = get_tmdb_details(media_type, int(tmdb), language=LANGUAGE)
+        title = tmdb_details.get('title', '')
+        release_date = tmdb_details.get('release_date', '')
+        formatted_title = f"{title} ({release_date.split('-')[0]})" if release_date else title
         overview = tmdb_details.get('overview', '')
         poster_id = tmdb_details.get('poster_path', '')
-        poster_path = download_and_get_poster_by_id(poster_id)
-        trailer = get_trailer_link(media_type, tmdb)
-        media_link = format_media_links(imdb, media_type, tmdb)
-        fmessage = format_message(formatted_title, overview, media_link, trailer)
-        return fmessage, True, poster_path
+        picture_path = download_and_get_poster_by_id(poster_id)
+        trailer = get_trailer_link(media_type, int(tmdb))
+        imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
+        tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}"
+        media_link = imdb_link + "\n" + tmdb_link
+        message = format_message(formatted_title, overview, media_link, trailer)
+        send_image = True
     elif is_season_ep_or_movie(media_type, title) == "season":
-        season_name, season_number = extract_season_info(title)
-        formatted_title = f"{season_name}, Saison {season_number}"
-        fmessage = format_message(formatted_title, "", "", "")
-        return fmessage, False, None
+        # It's a season
+        season_name = re.search(r"Season-added:\s*([^,]+)", title, flags=re.IGNORECASE).group(1)
+        season_number = re.search(r", Saison\s*([0-9]+)", title, flags=re.IGNORECASE).group(1)
+        formatted_title = season_name + ", Saison " + season_number
+        message = format_message(formatted_title, "", "", "")
     elif is_season_ep_or_movie(media_type, title) == "episode":
-        episode_title = re.search(r"Episode-added:\s*(.*)", title, flags=re.IGNORECASE).group(1)
-        media_link = format_media_links(imdb, media_type, tmdb)
-        fmessage = format_message(episode_title, "", media_link, "")
-        return fmessage, False, None
+        # It's an episode
+        formatted_title = re.search(r"Episode-added:\s*(.*)", title, flags=re.IGNORECASE).group(1)
+        if imdb:
+            imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
+            tmdb_link = f"• TMDb: {imdb_to_tmdb(imdb)}"
+            media_link = imdb_link + "\n" + tmdb_link
+        else:
+            media_link = ""
+        message = format_message(formatted_title, "", media_link, "")
     elif is_season_ep_or_movie(media_type, title) == "serie":
-        formatted_title, overview, poster_path, trailer, media_link = handle_serie(imdb, tmdb, media_type)
-        fmessage = format_message(formatted_title, overview, media_link, trailer)
-        return fmessage, True, poster_path
-    return None, False, None
+        # It's a series or other (documentary for example)
+        if not tmdb and not imdb:
+            message = format_message(title, "", "", "")
+        else:
+            tmdb_details = get_tmdb_details(media_type, int(tmdb), language=LANGUAGE)
+            title = tmdb_details.get('name', '')
+            release_date = tmdb_details.get('first_air_date', '')
+            formatted_title = f"{title} ({release_date.split('-')[0]})" if release_date else title
+            overview = tmdb_details.get('overview', '')
+            poster_id = tmdb_details.get('poster_path', '')
+            picture_path = download_and_get_poster_by_id(poster_id)
+            trailer = get_trailer_link(media_type, int(tmdb))
+            imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
+            tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}" if tmdb else f"• TMDb: {imdb_to_tmdb(imdb)}"
+            media_link = imdb_link + "\n" + tmdb_link
+            message = format_message(formatted_title, overview, media_link, trailer)
+            send_image = True
+
+    return {"message": message, "send_image": send_image, "picture_path": picture_path}
 
 def format_title(title: str, release_date: str) -> str:
     """
@@ -134,7 +165,7 @@ def is_season_ep_or_movie(media_type: str, title: str) -> str:
             return "serie"
     return None
 
-def format_message(title: str, overview: str, media_link: str, trailer: bool = False) -> str:
+def old_format_message(title: str, overview: str, media_link: str, trailer: bool = False) -> str:
     """
     Format the message to be sent.
 
@@ -156,31 +187,54 @@ def format_message(title: str, overview: str, media_link: str, trailer: bool = F
         message += trailer
     return message
 
-def send_to_all_connectors(connectors: dict, message: str, send_image: bool = False, picture_path: str = None):
+def format_message(title: str, overview: str, media_link: str, trailer: str = None) -> dict:
+    """
+    Format the message to be sent.
+
+    Args:
+        title (str): The title of the media.
+        overview (str): The synopsis of the media.
+        media_link (str): The links to the media (IMDb, TMDb).
+        trailer (str, optional): The link to the trailer.
+
+    Returns:
+        dict: The formatted message.
+    """
+    message = {
+        "title": title,
+        "description": overview,
+        "media_link": media_link,
+        "trailer": trailer
+    }
+    return message
+
+def send_to_all_connectors(connectors:dict, message: dict, options: dict):
     """
     Send the formatted message to all connectors.
 
     Args:
-        connectors (dict): Dictionary of connectors.
-        message (str): Message to be sent.
-        send_image (bool, optional): Whether to send an image. Defaults to False.
-        picture_path (str, optional): Path to the image file. Defaults to None.
+        connectors (dict): The loaded connectors
+        message (dict): Message to be sent.
+        options (dict): Additional options for the message
     """
-    for name, connector in connectors.items():
-        if hasattr(connector, 'send_message'):
-            options = {'send_image': send_image, 'picture_path': picture_path}
-            connector.send_message(message, options)
+    for connector_name, connector_module in connectors.items():
+        try:
+            response = connector_module.send_message(message, options)
+            if response:
+                logging.info(f"Message sent to {connector_name} successfully.")
+        except Exception as e:
+            logging.error(f"Failed to send message to {connector_name}: {e}")
 
 if __name__ == "__main__":
     # Example usage of handle_media function
-    media_type = "movie"
-    title = "Example Movie"
-    imdb = "tt1234567"
-    tmdb = 550
-    message, send_image, poster_path = handle_media(media_type, title, imdb, tmdb)
-    print(message)
-    print("Send image:", send_image)
-    print("Poster path:", poster_path)
+    data = {
+        "media_type": "movie",
+        "title": "Example Movie",
+        "imdb": "tt1234567",
+        "tmdb": "550"
+    }
+    result = handle_media(data)
+    print(result)
 
     # Example usage of send_to_all_connectors function
     connectors = {
@@ -191,5 +245,7 @@ if __name__ == "__main__":
             'send_message': lambda message, options: print(f"Sending via Slack: {message}, options: {options}")
         }
     }
-    send_to_all_connectors(connectors, message, send_image, poster_path)
+    send_to_all_connectors(connectors, message, options)
+
+
 
