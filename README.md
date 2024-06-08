@@ -34,7 +34,7 @@ JellyHookAPI is a flexible and extensible API that allows you to receive notific
 
 ---
 
-## Example
+## Use Case
 
 JellyHookAPI can receive media notifications and forward markdown-formatted messages with media details and trailers to services like WhatsApp. 
 
@@ -65,7 +65,7 @@ Total Supported Services: **2**
 
 ### Clone the Repository
 
-Usgin `git`:
+Using `git`:
 
 ```sh
 git clone https://github.com/garnajee/JellyHookAPI.git
@@ -111,7 +111,7 @@ JellyHookAPI is designed to be extensible through connectors. Each connector is 
 
 ### Example: Configuring WhatsApp Connector
 
-See this [README](connectors/README.md) for more informations.
+See this [README](connectors/whatsapp/README.md) for more informations.
 
 ---
 
@@ -122,10 +122,12 @@ I'd be happy to welcome contributions to JellyHookAPI! To contribute:
 ### Adding a New Connector
 
 1. **Fork the Repository**: Fork the repo on GitHub and clone your fork locally.
-2. **Create a Branch**: Create a new branch for your connector.
+2. **Create a Branch**: Create a new branch for your connector (`git checkout -b new-connector/your-connector`)
 3. **Add Your Connector**: Create a new folder in `connectors` and add your connector implementation.
-4. **Update Documentation**: Update the README in the new connector folder to include details of the new connector and its setup.
-5. **Pull Request**: Submit a pull request with a detailed description of your changes.
+  - Follow [these steps](connectors/README.md) to add a new connector properly
+4. **Update Documentation**: Update the README in the new connector folder to include details and its setup.
+5. **Push to the Branch**: Push your changes to the new branch (`git push origin new-connector/your-connector`)
+6. **Pull Request**: Submit a pull request with a detailed description of your changes.
 
 ### General Code Contributions
 
