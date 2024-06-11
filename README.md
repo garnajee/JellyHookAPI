@@ -107,9 +107,56 @@ docker-compose up -d
 
 ## Configuration
 
-JellyHookAPI is designed to be extensible through connectors. Each connector is responsible for forwarding messages to a third-party service.
+You must first configure Jellyfin, then configure the connector(s) you want to use.
 
-### Example: Configuring WhatsApp Connector
+### 1. Jellyfin Configuration
+
+You need to install the ["Webhook plugin"](https://github.com/jellyfin/jellyfin-plugin-webhook).
+
+In your Jellyfin Web UI:
+
+1. Go to **Extensions** > **Catalogue** > **Webhook**: install it and restart Jellyfin.
+2. Go back to **My extensions** > **Webhook** > **Add Generic Destination**
+3. Fill in the following details:
+   - **Webhook Name**: Choose a name.
+   - **Webhook URL**: Use the URL provided by `jellyhookapi` (Depending your docker network configuraion, e.g: `http://10.10.66.198:7778/api`
+   - **Notification Type**: Select **Item Added**.
+   - **Template**: Use the following code:
+
+```
+{
+  "media_type": "
+    {{~#if_equals ItemType 'Movie'~}}
+      movie
+    {{~else~}}
+      tv
+    {{~/if_equals~}}",
+  "title": "
+    {{~#if_equals ItemType 'Season'~}}
+        Season-added: {{{SeriesName}}}, {{{Name}}}
+    {{~else~}}
+      {{~#if_equals ItemType 'Episode'~}}
+        Episode-added: {{{SeriesName}}}, S{{SeasonNumber00}}E{{EpisodeNumber00}} - {{{Name}}}
+        {{~else~}}
+          {{{Name}}} ({{Year}}) has been added
+      {{~/if_equals~}}
+    {{~/if_equals~}}
+    ",
+  "imdb": "{{Provider_imdb}}",
+  "tmdb": "{{Provider_tmdb}}",
+  "watch_link": "{{ServerUrl}}/web/index.html#!/details?id={{ItemId}}&serverId={{ServerId}}"
+}
+```
+
+3. Add a Request Header:
+   - **Key**: `Content-Type`.
+   - **Value**: `application/json`.
+4. Save your configuration.
+
+
+### 2. Configure a connector - Example: Configuring WhatsApp Connector
+
+JellyHookAPI is designed to be extensible through connectors. Each connector is responsible for forwarding messages to a third-party service.
 
 See this [README](connectors/whatsapp/README.md) for more informations.
 
