@@ -2,8 +2,12 @@
 
 import re
 import os
+import logging
+from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL
 from utils.media_details import get_tmdb_details, imdb_to_tmdb, get_trailer_link
 from utils.download import download_and_get_poster_by_id
+
+logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s')
 
 def handle_media(data: dict) -> dict:
     """
@@ -246,6 +250,5 @@ if __name__ == "__main__":
         }
     }
     send_to_all_connectors(connectors, message, options)
-
 
 
