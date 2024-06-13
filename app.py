@@ -9,6 +9,7 @@ from utils.processing import handle_media, send_to_all_connectors
 app = Flask(__name__)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+#logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s')
 
 CONNECTORS_DIR = 'connectors'
 
@@ -58,7 +59,11 @@ def receive_data():
 
     try:
         if media_type and title:
-            message, send_image, picture_path = handle_media(media_type, title, imdb, tmdb)
+            result = handle_media(data)
+            message = result['message']
+            send_image = result['send_image']
+            picture_path = result['picture_path']
+            options = {"send_image": send_image, "picture_path": picture_path}
             send_to_all_connectors(connectors, message, options)
             return jsonify({'message': 'Data received successfully!'})
         else:
