@@ -31,12 +31,19 @@ def format_message_for_discord(message: dict, options: dict) -> dict:
     else:
         trailer_text = ""
 
+    links = message.get("media_link", {})
+    link_text = ""
+    if "imdb" in links:
+        link_text += f"\n\n[IMDb]({links['imdb']})"
+    if "tmdb" in links:
+        link_text += f"\n[TMDb]({links['tmdb']})"
+
     data = {
       "content": "",
       "embeds": [
         {
           "title": message.get("title", "Notification"),
-          "description": message.get("description","")+"\n\n"+message.get("media_link","")+trailer_text,
+          "description": message.get("description","")+link_text+trailer_text,
           "color": 3447003,  # light blue
           "footer": {
               "text": datetime.now().strftime("%H:%M - %d/%m/%Y")

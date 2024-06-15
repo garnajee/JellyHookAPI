@@ -23,20 +23,25 @@ def format_message(message: dict) -> str:
         str: Formatted message for WhatsApp.
     """
 
-    if message.get('trailer'):
-        trailers = message.get("trailer", [])
-        if len(trailers) == 1:
-            trailer_text = f"\n[Trailer]({trailers[0]})"
-        elif len(trailers) == 2:
-            trailer_text = f"\n[Trailer FR]({trailers[0]})\n[Trailer EN]({trailers[1]})"
-        else:
-            trailer_text = ""
+    trailers = message.get("trailer", [])
+    if len(trailers) == 1:
+        trailer_text = f"\n• Trailer: {trailers[0]}"
+    elif len(trailers) == 2:
+        trailer_text = f"\n• Trailer FR: {trailers[0]}\n• Trailer EN: {trailers[1]}"
+    else:
+        trailer_text = ""
+
+    links = message.get("media_link", {})
+    link_text = ""
+    if "imdb" in links:
+        link_text += f"\n\n• IMDb: {links['imdb']}"
+    if "tmdb" in links:
+        link_text += f"\n• TMDb: {links['tmdb']}"
 
     formatted_message = f"*{message.get('title')}*\n"
     if message.get('description'):
-        formatted_message += f"```{message.get('description')}```\n"
-    if message.get('media_link'):
-        formatted_message += f"{message.get('media_link')}\n"
+        formatted_message += f"```{message.get('description')}```"
+    formatted_message += link_text
     formatted_message += trailer_text
     return formatted_message
 
