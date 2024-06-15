@@ -22,12 +22,21 @@ def format_message_for_discord(message: dict, options: dict) -> dict:
     Returns:
         dict: The formatted payload for Discord.
     """
+
+    trailers = message.get("trailer", [])
+    if len(trailers) == 1:
+        trailer_text = f"\n[Trailer]({trailers[0]})"
+    elif len(trailers) == 2:
+        trailer_text = f"\n[Trailer FR]({trailers[0]})\n[Trailer EN]({trailers[1]})"
+    else:
+        trailer_text = ""
+
     data = {
       "content": "",
       "embeds": [
         {
           "title": message.get("title", "Notification"),
-          "description": message.get("description","")+"\n"+message.get("media_link","")+"\n"+message.get("trailer",""),
+          "description": message.get("description","")+"\n\n"+message.get("media_link","")+trailer_text,
           "color": 3447003,  # light blue
           "footer": {
               "text": datetime.now().strftime("%H:%M - %d/%m/%Y")

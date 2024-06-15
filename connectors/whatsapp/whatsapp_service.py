@@ -22,13 +22,22 @@ def format_message(message: dict) -> str:
     Returns:
         str: Formatted message for WhatsApp.
     """
+
+    if message.get('trailer'):
+        trailers = message.get("trailer", [])
+        if len(trailers) == 1:
+            trailer_text = f"\n[Trailer]({trailers[0]})"
+        elif len(trailers) == 2:
+            trailer_text = f"\n[Trailer FR]({trailers[0]})\n[Trailer EN]({trailers[1]})"
+        else:
+            trailer_text = ""
+
     formatted_message = f"*{message.get('title')}*\n"
     if message.get('description'):
         formatted_message += f"```{message.get('description')}```\n"
     if message.get('media_link'):
         formatted_message += f"{message.get('media_link')}\n"
-    if message.get('trailer'):
-        formatted_message += message.get('trailer')
+    formatted_message += trailer_text
     return formatted_message
 
 def send_message(message: dict, options: dict = None) -> requests.Response:
