@@ -40,12 +40,13 @@ def handle_media(data: dict) -> dict:
         picture_path = download_and_get_poster_by_id(poster_id)
         trailer = get_trailer_link(media_type, int(tmdb))
         #mdb_links = {
-        #    "imdb": f"https://imdb.com/title/{imdb}",
-        #    "tmdb": f"https://tmdb.org/{media_type}/{tmdb}"
-        #}
-        imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
-        tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}"
-        media_link = imdb_link + "\n" + tmdb_link
+        media_link = {
+            "imdb": f"https://imdb.com/title/{imdb}",
+            "tmdb": f"https://tmdb.org/{media_type}/{tmdb}"
+        }
+        #imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
+        #tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}"
+        #media_link = imdb_link + "\n" + tmdb_link
         message = format_message(formatted_title, overview, media_link, trailer)
         send_image = True
     elif is_season_ep_or_movie(media_type, title) == "season":
@@ -53,21 +54,25 @@ def handle_media(data: dict) -> dict:
         season_name = re.search(r"Season-added:\s*([^,]+)", title, flags=re.IGNORECASE).group(1)
         season_number = re.search(r", Saison\s*([0-9]+)", title, flags=re.IGNORECASE).group(1)
         formatted_title = season_name + ", Saison " + season_number
-        message = format_message(formatted_title, "", "", "")
+        message = format_message(formatted_title, "", None, None)
     elif is_season_ep_or_movie(media_type, title) == "episode":
         # It's an episode
         formatted_title = re.search(r"Episode-added:\s*(.*)", title, flags=re.IGNORECASE).group(1)
         if imdb:
-            imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
-            tmdb_link = f"• TMDb: {imdb_to_tmdb(imdb)}"
-            media_link = imdb_link + "\n" + tmdb_link
+            media_link = {
+                "imdb": f"https://imdb.com/title/{imdb}",
+                "tmdb": f"{imdb_to_tmdb(imdb)}"
+            }
+            #imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
+            #tmdb_link = f"• TMDb: {imdb_to_tmdb(imdb)}"
+            #media_link = imdb_link + "\n" + tmdb_link
         else:
-            media_link = ""
-        message = format_message(formatted_title, "", media_link, "")
+            media_link = None
+        message = format_message(formatted_title, "", media_link, None)
     elif is_season_ep_or_movie(media_type, title) == "serie":
         # It's a series or other (documentary for example)
         if not tmdb and not imdb:
-            message = format_message(title, "", "", "")
+            message = format_message(title, "", None, None)
         else:
             tmdb_details = get_tmdb_details(media_type, int(tmdb), language=LANGUAGE)
             title = tmdb_details.get('name', '')
@@ -77,9 +82,13 @@ def handle_media(data: dict) -> dict:
             poster_id = tmdb_details.get('poster_path', '')
             picture_path = download_and_get_poster_by_id(poster_id)
             trailer = get_trailer_link(media_type, int(tmdb))
-            imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
-            tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}" if tmdb else f"• TMDb: {imdb_to_tmdb(imdb)}"
-            media_link = imdb_link + "\n" + tmdb_link
+            media_link = {
+                "imdb": f"https://imdb.com/title/{imdb}",
+                "tmdb": f"https://tmdb.org/{media_type}/{tmdb}" if tmdb else f"{imdb_to_tmdb(imdb)}"
+            }
+            #imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
+            #tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}" if tmdb else f"• TMDb: {imdb_to_tmdb(imdb)}"
+            #media_link = imdb_link + "\n" + tmdb_link
             message = format_message(formatted_title, overview, media_link, trailer)
             send_image = True
 
@@ -173,37 +182,15 @@ def is_season_ep_or_movie(media_type: str, title: str) -> str:
             return "serie"
     return None
 
-def old_format_message(title: str, overview: str, media_link: str, trailer: bool = False) -> str:
-    """
-    Format the message to be sent.
-
-    Args:
-        title (str): Title of the media.
-        overview (str): Overview of the media.
-        media_link (str): Links to media details.
-        trailer (bool, optional): Whether to include trailer links. Defaults to False.
-
-    Returns:
-        str: Formatted message.
-    """
-    message = f"*{title}*\n"
-    if overview:
-        message += f"```{overview}```\n"
-    if media_link:
-        message += f"{media_link}\n"
-    if trailer:
-        message += trailer
-    return message
-
-def format_message(title: str, overview: str, media_link: str, trailer: str = None) -> dict:
+def format_message(title: str, overview: str, media_link: dict = None, trailer: list = None) -> dict:
     """
     Format the message to be sent.
 
     Args:
         title (str): The title of the media.
         overview (str): The synopsis of the media.
-        media_link (str): The links to the media (IMDb, TMDb).
-        trailer (str, optional): The link to the trailer.
+        media_link (dict): The links to the media (IMDb, TMDb).
+        trailer (list, optional): The link(s) to the trailer.
 
     Returns:
         dict: The formatted message.
