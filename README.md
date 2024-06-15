@@ -186,6 +186,11 @@ I'd be happy to welcome contributions to JellyHookAPI! To contribute:
 
 ---
 
+#### TODO
+
+- [ ] LANGUAGE always = `bande[-\s]?annonce`, same for LANGUAGE2 in `get_trailer_link()`, change this
+- [x] send non-formatted links (trailer, t/imdb) to connectors
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
