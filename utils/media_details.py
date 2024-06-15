@@ -54,7 +54,7 @@ def imdb_to_tmdb(imdb_id: str) -> str:
         logging.error(f"Error fetching TMDB link from IMDb ID: {e}")
     return None
 
-def get_trailer_link(media_type: str, tmdbid: int) -> str:
+def get_trailer_link(media_type: str, tmdbid: int) -> list:
     """
     Get the Youtube trailer link.
 
@@ -63,7 +63,7 @@ def get_trailer_link(media_type: str, tmdbid: int) -> str:
         tmdbid (int): TMDB ID of the media.
 
     Returns:
-        str: Trailer link.
+        list: Trailer link(s).
     """
     languages = [(LANGUAGE, r"bande[-\s]?annonce"), (LANGUAGE2, r"trailer")]
     trailer_links = []
@@ -72,12 +72,7 @@ def get_trailer_link(media_type: str, tmdbid: int) -> str:
         youtube_key = search_trailer_key(vidt, language, pattern)
         if youtube_key:
             trailer_links.append(f"https://youtu.be/{youtube_key}")
-    if trailer_links:
-        if len(trailer_links) == 2:
-            return f"• Trailer FR: {trailer_links[0]}\n • Trailer EN: {trailer_links[1]}"
-        elif len(trailer_links) == 1:
-            return f"• Trailer: {trailer_links[0]}\n"
-    return ""
+    return trailer_links
 
 def search_trailer_key(vidt: str, language: str, pattern: str) -> str:
     """

@@ -39,6 +39,10 @@ def handle_media(data: dict) -> dict:
         poster_id = tmdb_details.get('poster_path', '')
         picture_path = download_and_get_poster_by_id(poster_id)
         trailer = get_trailer_link(media_type, int(tmdb))
+        #mdb_links = {
+        #    "imdb": f"https://imdb.com/title/{imdb}",
+        #    "tmdb": f"https://tmdb.org/{media_type}/{tmdb}"
+        #}
         imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
         tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}"
         media_link = imdb_link + "\n" + tmdb_link
