@@ -14,6 +14,7 @@ def download_and_get_poster_by_id(poster_id: str) -> str:
     Returns:
         str: Path to the downloaded poster.
     """
+    # all availables size: https://api.themoviedb.org/3/configuration
     poster_url = f"https://image.tmdb.org/t/p/w342/{poster_id}"
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
