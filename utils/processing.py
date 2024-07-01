@@ -7,7 +7,7 @@ from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL
 from utils.media_details import get_tmdb_details, imdb_to_tmdb, get_trailer_link
 from utils.download import download_and_get_poster_by_id
 
-logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s')
+#logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s')
 
 def handle_media(data: dict) -> dict:
     """
@@ -31,8 +31,9 @@ def handle_media(data: dict) -> dict:
 
     if is_season_ep_or_movie(media_type, title) == "movie":
         # It's a movie
-        if imdb and not tmdb:
-            tmdb = imdb_to_tmdb(imdb)
+        # very rare case where we have only imdb id
+        ##if imdb and not tmdb:
+        ##    tmdb = imdb_to_tmdb(imdb)
         tmdb_details = get_tmdb_details(media_type, tmdb, language=LANGUAGE)
         title = tmdb_details.get('title', '')
         release_date = tmdb_details.get('release_date', '')
@@ -232,6 +233,8 @@ if __name__ == "__main__":
     }
     result = handle_media(data)
     print(result)
+    message = result['message']
+    options = {"send_image": result['send_image'], "picture_path": result['picture_path']}
 
     # Example usage of send_to_all_connectors function
     connectors = {
