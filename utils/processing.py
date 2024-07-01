@@ -143,7 +143,7 @@ def handle_serie(imdb: str, tmdb: str, media_type: str):
 
     Args:
         imdb (str): IMDb ID of the series.
-        tmdb (int): TMDB ID of the series.
+        tmdb (str): TMDB ID of the series.
         media_type (str): Type of media (tv).
 
     Returns:
