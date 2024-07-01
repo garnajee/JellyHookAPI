@@ -31,6 +31,8 @@ def handle_media(data: dict) -> dict:
 
     if is_season_ep_or_movie(media_type, title) == "movie":
         # It's a movie
+        if imdb:
+            tmdb = imdb_to_tmdb(imdb)
         tmdb_details = get_tmdb_details(media_type, tmdb, language=LANGUAGE)
         title = tmdb_details.get('title', '')
         release_date = tmdb_details.get('release_date', '')
