@@ -88,7 +88,7 @@ def send_message(message: dict, options: dict = None) -> requests.Response:
 
         # Upload the image and get the content URI
         image_path = options.get('picture_path')
-        image_uri = upload_image(MATRIX_URL, ACCESS_TOKEN, image_path)
+        image_uri = upload_image(image_path)
 
         # Send the image message
         send_image_url = f"{MATRIX_URL}/_matrix/client/r0/rooms/{ROOM_ID}/send/m.room.message"
