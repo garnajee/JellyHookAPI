@@ -3,6 +3,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
 
@@ -21,29 +22,32 @@ def format_message(message: dict) -> str:
     Returns:
         str: Formatted message for WhatsApp.
     """
+    try:
+        # Markdown formatted
+        trailers = message.get("trailer", [])
+        if len(trailers) == 1:
+            trailer_text = f"\n[Trailer]({trailers[0]})"
+        elif len(trailers) == 2:
+            trailer_text = f"\n[Trailer FR]({trailers[0]})\n[Trailer EN]({trailers[1]})"
+        else:
+            trailer_text = ""
 
-    # Markdown formatted
-    trailers = message.get("trailer", [])
-    if len(trailers) == 1:
-        trailer_text = f"\n[Trailer]({trailers[0]})"
-    elif len(trailers) == 2:
-        trailer_text = f"\n[Trailer FR]({trailers[0]})\n[Trailer EN]({trailers[1]})"
-    else:
-        trailer_text = ""
+        links = message.get("media_link", {})
+        link_text = ""
+        if "imdb" in links:
+            link_text += f"\n\n[IMDb]({links['imdb']})"
+        if "tmdb" in links:
+            link_text += f"\n[TMDb]({links['tmdb']})"
 
-    links = message.get("media_link", {})
-    link_text = ""
-    if "imdb" in links:
-        link_text += f"\n\n[IMDb]({links['imdb']})"
-    if "tmdb" in links:
-        link_text += f"\n[TMDb]({links['tmdb']})"
-
-    formatted_message = f"*{message.get('title')}*\n"
-    if message.get('description'):
-        formatted_message += f"```{message.get('description')}```"
-    formatted_message += link_text
-    formatted_message += trailer_text
-    return formatted_message
+        formatted_message = f"*{message.get('title')}*\n"
+        if message.get('description'):
+            formatted_message += f"```{message.get('description')}```"
+        formatted_message += link_text
+        formatted_message += trailer_text
+        return formatted_message
+    except Exception as e:
+        logging.error(f"Error formatting message: {e}")
+        return ""
 
 def send_message(message: dict, options: dict = None) -> requests.Response:
     """
@@ -67,7 +71,28 @@ def send_message(message: dict, options: dict = None) -> requests.Response:
         response = requests.post(url, headers={'Authorization': f'Bearer {API_KEY}'}, data=data, auth=auth)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
+        logging.error(f"Error sending message: {e}")
         return None
 
     return response
+
+if __name == "__main__":
+    message = {
+        "title": "Example Title",
+        "description": "Example Description",
+        "trailer": ["http://example.com/trailer1", "http://example.com/trailer2"],
+        "media_link": {
+            "imdb": "http://example.com/imdb",
+            "tmdb": "http://example.com/tmdb"
+        }
+    }
+    options = {
+        "send_image": True,
+        "picture_path": "https://picsum.photos/200"
+    }
+    response = send_message(message, options)
+    if response:
+        logging.info("Response:", response.status_code)
+    else:
+        logging.info("Failed to send message")
 
