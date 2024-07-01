@@ -5,6 +5,8 @@ import requests
 from dotenv import load_dotenv
 import logging
 
+#logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s')
+
 load_dotenv()
 
 MATRIX_URL = os.getenv("MATRIX_URL")
@@ -23,7 +25,9 @@ def format_message(message: dict) -> str:
     """
 
     try:
-        trailers = message.get("trailer", [])
+        trailers = message.get("trailer",[])
+        if trailers is None:
+            trailers = []
         if len(trailers) == 1:
             trailer_text = f"\n[Trailer]({trailers[0]})"
         elif len(trailers) == 2:
@@ -32,6 +36,8 @@ def format_message(message: dict) -> str:
             trailer_text = ""
 
         links = message.get("media_link", {})
+        if links is None:
+            links = {}
         link_text = ""
         if "imdb" in links:
             link_text += f"\n\n[IMDb]({links['imdb']})"
@@ -83,32 +89,42 @@ def send_message(message: dict, options: dict = None) -> requests.Response:
     Returns:
         Response object: The response from the Matrix server.
     """
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
     try:
         formatted_message = format_message(message)
 
-        # Upload the image and get the content URI
-        image_path = options.get('picture_path')
-        image_uri = upload_image(image_path)
+        # Check if we need to send an image
+        if options.get('send_image') and options.get('picture_path'):
+            image_path = options.get('picture_path')
+            if not image_path:
+                logging.error("picture_path is None")
+                raise ValueError("picture_path is None")
+            
+            # Upload the image and get the content URI
+            image_uri = upload_image(image_path)
+            if not image_uri:
+                logging.error("Failed to upload image")
+                raise Exception("Failed to upload image")
 
-        # Send the image message
-        send_image_url = f"{MATRIX_URL}/_matrix/client/r0/rooms/{ROOM_ID}/send/m.room.message"
-        headers = {
-            "Authorization": f"Bearer {ACCESS_TOKEN}",
-            "Content-Type": "application/json"
-        }
-        image_info = {
-            "msgtype": "m.image",
-            "body": os.path.basename(image_path),
-            "url": image_uri,
-            "info": {
-                "mimetype": "image/jpeg",
-                "size": os.path.getsize(image_path),
-                "w": 342,
-                "h": 513
+            # Send the image message
+            send_image_url = f"{MATRIX_URL}/_matrix/client/r0/rooms/{ROOM_ID}/send/m.room.message"
+            image_info = {
+                "msgtype": "m.image",
+                "body": os.path.basename(image_path),
+                "url": image_uri,
+                "info": {
+                    "mimetype": "image/jpeg",
+                    "size": os.path.getsize(image_path),
+                    "w": 342,
+                    "h": 513
+                }
             }
-        }
-        response = requests.post(send_image_url, headers=headers, json=image_info)
-        response.raise_for_status()
+
+            response = requests.post(send_image_url, headers=headers, json=image_info)
+            response.raise_for_status()
 
         # Send the formatted message
         send_text_url = f"{MATRIX_URL}/_matrix/client/r0/rooms/{ROOM_ID}/send/m.room.message"
