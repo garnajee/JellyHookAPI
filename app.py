@@ -50,12 +50,7 @@ def receive_data():
     media_type = data.get('media_type', '')
     title = data.get('title', '')
     imdb = data.get('imdb', '')
-    tmdb = data.get('tmdb', None)
-
-    try:
-        tmdb = int(tmdb) if tmdb else None
-    except ValueError:
-        return jsonify({'message': 'Invalid TMDB ID!'}), 400
+    tmdb = data.get('tmdb', '')
 
     try:
         if media_type and title:
