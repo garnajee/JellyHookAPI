@@ -44,10 +44,11 @@ For instance, when a new movie is added to your media server, after receiving no
 
 ## Supported Services
 
-Total Supported Services: **2**
+Total Supported Services: **3**
 
 | Service  | Send Messages | Send Images |
 |----------|:-------------:|:-----------:|
+| Matrix   | ✅            | ✅          |
 | WhatsApp | ✅            | ✅          |
 | Discord  | ✅            | ✅          |
 | *Soon*   | ✅            | ❌          |
