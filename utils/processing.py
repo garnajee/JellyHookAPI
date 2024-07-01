@@ -31,14 +31,14 @@ def handle_media(data: dict) -> dict:
 
     if is_season_ep_or_movie(media_type, title) == "movie":
         # It's a movie
-        tmdb_details = get_tmdb_details(media_type, int(tmdb), language=LANGUAGE)
+        tmdb_details = get_tmdb_details(media_type, tmdb, language=LANGUAGE)
         title = tmdb_details.get('title', '')
         release_date = tmdb_details.get('release_date', '')
         formatted_title = f"{title} ({release_date.split('-')[0]})" if release_date else title
         overview = tmdb_details.get('overview', '')
         poster_id = tmdb_details.get('poster_path', '')
         picture_path = download_and_get_poster_by_id(poster_id)
-        trailer = get_trailer_link(media_type, int(tmdb))
+        trailer = get_trailer_link(media_type, tmdb)
         #mdb_links = {
         media_link = {
             "imdb": f"https://imdb.com/title/{imdb}",
@@ -74,14 +74,14 @@ def handle_media(data: dict) -> dict:
         if not tmdb and not imdb:
             message = format_message(title, "", None, None)
         else:
-            tmdb_details = get_tmdb_details(media_type, int(tmdb), language=LANGUAGE)
+            tmdb_details = get_tmdb_details(media_type, tmdb, language=LANGUAGE)
             title = tmdb_details.get('name', '')
             release_date = tmdb_details.get('first_air_date', '')
             formatted_title = f"{title} ({release_date.split('-')[0]})" if release_date else title
             overview = tmdb_details.get('overview', '')
             poster_id = tmdb_details.get('poster_path', '')
             picture_path = download_and_get_poster_by_id(poster_id)
-            trailer = get_trailer_link(media_type, int(tmdb))
+            trailer = get_trailer_link(media_type, tmdb)
             media_link = {
                 "imdb": f"https://imdb.com/title/{imdb}",
                 "tmdb": f"https://tmdb.org/{media_type}/{tmdb}" if tmdb else f"{imdb_to_tmdb(imdb)}"
@@ -121,14 +121,14 @@ def extract_season_info(title: str) -> (str, str):
     season_number = re.search(r", Saison\s*([0-9]+)", title, flags=re.IGNORECASE).group(1)
     return season_name, season_number
 
-def format_media_links(imdb: str, media_type: str, tmdb: int) -> str:
+def format_media_links(imdb: str, media_type: str, tmdb: str) -> str:
     """
     Format media links for IMDb and TMDB.
 
     Args:
         imdb (str): IMDb ID of the media.
         media_type (str): Type of media (movie, tv).
-        tmdb (int): TMDB ID of the media.
+        tmdb (str): TMDB ID of the media.
 
     Returns:
         str: Formatted media links.
@@ -137,7 +137,7 @@ def format_media_links(imdb: str, media_type: str, tmdb: int) -> str:
     tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}" if tmdb else f"• TMDb: {imdb_to_tmdb(imdb)}"
     return imdb_link + "\n" + tmdb_link
 
-def handle_serie(imdb: str, tmdb: int, media_type: str):
+def handle_serie(imdb: str, tmdb: str, media_type: str):
     """
     Handle processing for series.
 
