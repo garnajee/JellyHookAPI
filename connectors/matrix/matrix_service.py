@@ -126,7 +126,6 @@ def html_format_message(message: dict) -> str:
         logging.error(f"Error formatting message: {e}")
         return ""
 
-
 def upload_image(image_path: str) -> str:
     """
     Upload image to the Matrix server.
