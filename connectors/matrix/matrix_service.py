@@ -90,42 +90,6 @@ def html_format_message(message: dict) -> str:
         logging.error(f"Error formatting message: {e}")
         return ""
 
-def html_format_message(message: dict) -> str:
-    """
-    Format message for Matrix channel in HTML.
-
-    Args:
-        message (dict): Message to send.
-
-    Returns:
-        str: Formatted message for Matrix in HTML.
-    """
-    try:
-        trailers = message.get("trailer", [])
-        if len(trailers) == 1:
-            trailer_text = f'<br><a href="{trailers[0]}">Trailer</a>'
-        elif len(trailers) == 2:
-            trailer_text = f'<br><a href="{trailers[0]}">Trailer FR</a><br><a href="{trailers[1]}">Trailer EN</a>'
-        else:
-            trailer_text = ""
-
-        links = message.get("media_link", {})
-        link_text = ""
-        if "imdb" in links:
-            link_text += f'<br><br><a href="{links["imdb"]}">IMDb</a>'
-        if "tmdb" in links:
-            link_text += f'<br><a href="{links["tmdb"]}">TMDb</a>'
-
-        formatted_message = f'<h1>{message.get("title")}</h1><br/>'
-        if message.get('description'):
-            formatted_message += f'<pre>{message.get("description")}</pre>'
-        formatted_message += link_text
-        formatted_message += trailer_text
-        return formatted_message
-    except Exception as e:
-        logging.error(f"Error formatting message: {e}")
-        return ""
-
 def upload_image(image_path: str) -> str:
     """
     Upload image to the Matrix server.
