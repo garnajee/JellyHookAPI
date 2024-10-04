@@ -218,6 +218,10 @@ def send_to_all_connectors(connectors:dict, message: dict, options: dict):
         message (dict): Message to be sent.
         options (dict): Additional options for the message
     """
+    if not message:  # if message is None or empty
+        logging.warning("No message to send. Skipping sending to connectors.")
+        return
+
     for connector_name, connector_module in connectors.items():
         try:
             response = connector_module.send_message(message, options)
