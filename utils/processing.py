@@ -30,7 +30,7 @@ def handle_media(data: dict) -> dict:
     picture_path = None
 
     # if you want to skip episode notifications
-    skip_episode = True
+    skip_episode = False
 
     if is_season_ep_or_movie(media_type, title) == "movie":
         # It's a movie
