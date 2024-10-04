@@ -161,6 +161,10 @@ JellyHookAPI is designed to be extensible through connectors. Each connector is 
 
 See this [README](connectors/whatsapp/README.md) for more informations.
 
+### 3. (Optionnal) - Disable notification for episode only
+
+When a new episode is added, you will receive a notification, but if you want to disable these notifications, simply change `skip_episode = False` to `True` in `utils/processing.py` line 33.
+
 ---
 
 ## Contributing
