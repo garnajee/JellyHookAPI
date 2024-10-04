@@ -29,6 +29,9 @@ def handle_media(data: dict) -> dict:
     send_image = False
     picture_path = None
 
+    # if you want to skip episode notifications
+    skip_episode = True
+
     if is_season_ep_or_movie(media_type, title) == "movie":
         # It's a movie
         # very rare case where we have only imdb id
@@ -58,7 +61,7 @@ def handle_media(data: dict) -> dict:
         season_number = re.search(r", Saison\s*([0-9]+)", title, flags=re.IGNORECASE).group(1)
         formatted_title = season_name + ", Saison " + season_number
         message = format_message(formatted_title, "", None, None)
-    elif is_season_ep_or_movie(media_type, title) == "episode":
+    elif not skip_episode and is_season_ep_or_movie(media_type, title) == "episode":
         # It's an episode
         formatted_title = re.search(r"Episode-added:\s*(.*)", title, flags=re.IGNORECASE).group(1)
         if imdb:
