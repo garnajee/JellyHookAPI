@@ -17,17 +17,38 @@ def get_tmdb_details(media_type: str, tmdbid: str, language: str = LANGUAGE) -> 
         dict: Details of the media.
     """
     url = f"{BASE_URL}/{media_type}/{tmdbid}"
-    params = {
+    
+    params_primary = {
         'api_key': TMDB_API_KEY,
         'language': language,
     }
+    
+    params_secondary = {
+        'api_key': TMDB_API_KEY,
+        'language': LANGUAGE2,
+    }
+    
     try:
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()
-        return response.json()
+        response_primary = requests.get(url, params=params_primary, timeout=10)
+        response_primary.raise_for_status()
+        details = response_primary.json()
+
+        # If details are incomplete, fetch with the secondary language
+        if any(not details.get(key) for key in details):
+            response_secondary = requests.get(url, params=params_secondary, timeout=10)
+            response_secondary.raise_for_status()
+            details_secondary = response_secondary.json()
+
+            # Fill in any empty fields from the secondary language
+            for key, value in details_secondary.items():
+                if not details.get(key):
+                    details[key] = value
+
     except requests.RequestException as e:
         logging.error(f"Error fetching TMDB details: {e}")
         return {}
+
+    return details
 
 def imdb_to_tmdb(imdb_id: str) -> str:
     """
