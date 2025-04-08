@@ -14,7 +14,7 @@ def handle_media(data: dict) -> dict:
     Manage media data and format the message.
 
     Args:
-        data (dict): The media data.
+        data (dict): The media data from Jellyfin.
 
     Returns:
         dict: The formatted message and options.
@@ -38,7 +38,7 @@ def handle_media(data: dict) -> dict:
         ##if imdb and not tmdb:
         ##    tmdb = imdb_to_tmdb(imdb)
         tmdb_details = get_tmdb_details(media_type, tmdb, language=LANGUAGE)
-        title = tmdb_details.get('title', '')
+        title = tmdb_details.get('title', title)    # get title from tdmb or keep the one from Jellyfin.
         release_date = tmdb_details.get('release_date', '')
         formatted_title = f"{title} ({release_date.split('-')[0]})" if release_date else title
         overview = tmdb_details.get('overview', '')
