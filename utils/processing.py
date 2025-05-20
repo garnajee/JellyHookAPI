@@ -47,8 +47,8 @@ def handle_media(data: dict) -> dict:
         trailer = get_trailer_link(media_type, tmdb)
         #mdb_links = {
         media_link = {
-            "imdb": f"https://imdb.com/title/{imdb}",
-            "tmdb": f"https://tmdb.org/{media_type}/{tmdb}"
+            "imdb": f"https://imdb.com/title/{imdb}" if imdb else None,
+            "tmdb": f"https://tmdb.org/{media_type}/{tmdb}" if tmdb else None
         }
         #imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
         #tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}"
@@ -89,8 +89,8 @@ def handle_media(data: dict) -> dict:
             picture_path = download_and_get_poster_by_id(poster_id)
             trailer = get_trailer_link(media_type, tmdb)
             media_link = {
-                "imdb": f"https://imdb.com/title/{imdb}",
-                "tmdb": f"https://tmdb.org/{media_type}/{tmdb}" if tmdb else f"{imdb_to_tmdb(imdb)}"
+                "imdb": f"https://imdb.com/title/{imdb}" if imdb else None,
+                "tmdb": f"https://tmdb.org/{media_type}/{tmdb}" if tmdb else (f"{imdb_to_tmdb(imdb)}" if imdb else None)
             }
             #imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
             #tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}" if tmdb else f"• TMDb: {imdb_to_tmdb(imdb)}"
