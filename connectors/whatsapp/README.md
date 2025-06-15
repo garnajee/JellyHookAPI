@@ -1,5 +1,8 @@
 # WhatsApp Connector
 
+> [!NOTE]
+> This is the old way of sending messages on whatsapp. I recommend using matrix and the mautrix-whatsapp bridge.
+
 ## Overview
 
 Since there is no free/public API for WhatsApp, you need to use a third-party service to send WhatsApp messages. In this connector, we use an open-source Docker solution called [go-whatsapp-web-multidevice](https://github.com/aldinokemal/go-whatsapp-web-multidevice) which simulates a WhatsApp Web connection and provides an API to send messages.
