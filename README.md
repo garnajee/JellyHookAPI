@@ -193,8 +193,8 @@ I'd be happy to welcome contributions to JellyHookAPI! To contribute:
 
 #### TODO
 
-- [ ] LANGUAGE always = `bande[-\s]?annonce`, same for LANGUAGE2 in `get_trailer_link()`, change this
 - [x] send non-formatted links (trailer, t/imdb) to connectors
+- [ ] improve non-movie/serie message without tmdb/imdb, or find other source
 
 ## License
 
