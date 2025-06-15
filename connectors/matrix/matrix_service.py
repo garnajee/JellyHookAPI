@@ -166,6 +166,8 @@ def send_message(message: dict, options: dict = None) -> requests.Response:
 
         # Send the formatted message
         send_text_url = f"{MATRIX_URL}/_matrix/client/r0/rooms/{ROOM_ID}/send/m.room.message"
+        # associated documentation: https://spec.matrix.org/latest/client-server-api/#send-m-room-message
+        # change to m.text and commend format and formatted_body if you encounter issue sending message.
         text_info = {
             "msgtype": "m.notice", # for automated client, no answer expected
             "body": formatted_message, # notice text to send. Plain text, if html client formatting is not supported
