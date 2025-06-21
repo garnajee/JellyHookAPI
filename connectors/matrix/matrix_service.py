@@ -167,12 +167,12 @@ def send_message(message: dict, options: dict = None) -> requests.Response:
         # Send the formatted message
         send_text_url = f"{MATRIX_URL}/_matrix/client/r0/rooms/{ROOM_ID}/send/m.room.message"
         # associated documentation: https://spec.matrix.org/latest/client-server-api/#send-m-room-message
-        # change to m.text and commend format and formatted_body if you encounter issue sending message.
+        # changed from m.notice to m.text and comment format and formatted_body as I encounter issue sending message.
         text_info = {
-            "msgtype": "m.notice", # for automated client, no answer expected
+            "msgtype": "m.text", # m.notice: for automated client, no answer expected
             "body": formatted_message, # notice text to send. Plain text, if html client formatting is not supported
-            "format": "org.matrix.custom.html", # format used in formatted_body
-            "formatted_body": html_formatted_message # formatted version of body. Required if format is specified
+            #"format": "org.matrix.custom.html", # format used in formatted_body
+            #"formatted_body": html_formatted_message # formatted version of body. Required if format is specified
         }
         response = requests.post(send_text_url, headers=headers, json=text_info)
         response.raise_for_status()
