@@ -57,10 +57,15 @@ class TestJellyfinMediaDetails(unittest.TestCase):
         }
 
         # Act
-        result = get_jellyfin_media_details("some_item_id")
+        result = get_jellyfin_media_details("some_item_id", "some_user_id")
 
         # Assert
         self.assertEqual(result, expected_details)
+        mock_requests_get.assert_called_once_with(
+            "http://fake-jellyfin:8096/Users/some_user_id/Items/some_item_id",
+            headers={'X-Emby-Token': 'fake-key'},
+            timeout=10
+        )
 
     @patch('utils.media_details.requests.get')
     @patch('utils.media_details.JELLYFIN_API_URL', 'http://fake-jellyfin:8096')
@@ -70,7 +75,7 @@ class TestJellyfinMediaDetails(unittest.TestCase):
         mock_requests_get.side_effect = requests.exceptions.RequestException("API is down")
 
         # Act
-        result = get_jellyfin_media_details("some_item_id")
+        result = get_jellyfin_media_details("some_item_id", "some_user_id")
 
         # Assert
         self.assertEqual(result, {})
@@ -79,7 +84,14 @@ class TestJellyfinMediaDetails(unittest.TestCase):
     @patch('utils.media_details.JELLYFIN_API_KEY', None)
     def test_get_jellyfin_media_details_no_config(self):
         # Act
-        result = get_jellyfin_media_details("some_item_id")
+        result = get_jellyfin_media_details("some_item_id", "some_user_id")
+
+        # Assert
+        self.assertEqual(result, {})
+
+    def test_get_jellyfin_media_details_no_user_id(self):
+        # Act
+        result = get_jellyfin_media_details("some_item_id", "")
 
         # Assert
         self.assertEqual(result, {})

@@ -128,7 +128,7 @@ In your Jellyfin Web UI:
    - **Webhook Name**: Choose a name.
    - **Webhook URL**: Use the URL provided by `jellyhookapi` (Depending your docker network configuraion, e.g: `http://10.10.66.198:7778/api`
    - **Notification Type**: Select **Item Added**.
-   - **Template**: Use the following code. This version adds the `item_id` required to fetch technical details.
+   - **Template**: Use the following code. This version adds the `item_id` and `user_id` required to fetch technical details.
 
 ```
 {
@@ -152,6 +152,7 @@ In your Jellyfin Web UI:
   "imdb": "{{Provider_imdb}}",
   "tmdb": "{{Provider_tmdb}}",
   "item_id": "{{ItemId}}",
+  "user_id": "{{UserId}}",
   "watch_link": "{{ServerUrl}}/web/index.html#!/details?id={{ItemId}}&serverId={{ServerId}}"
 }
 ```

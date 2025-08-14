@@ -9,13 +9,14 @@ from utils.download import download_and_get_poster_by_id
 
 #logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s')
 
-def handle_media(data: dict, item_id: str) -> dict:
+def handle_media(data: dict, item_id: str, user_id: str) -> dict:
     """
     Manage media data and format the message.
 
     Args:
         data (dict): The media data from Jellyfin.
         item_id (str): The Jellyfin item ID.
+        user_id (str): The Jellyfin user ID.
 
     Returns:
         dict: The formatted message and options.
@@ -51,7 +52,7 @@ def handle_media(data: dict, item_id: str) -> dict:
             "imdb": f"https://imdb.com/title/{imdb}" if imdb else None,
             "tmdb": f"https://tmdb.org/{media_type}/{tmdb}" if tmdb else None
         }
-        technical_details = get_jellyfin_media_details(item_id)
+        technical_details = get_jellyfin_media_details(item_id, user_id)
         message = format_message(formatted_title, overview, media_link, trailer, technical_details)
         send_image = True
     elif is_season_ep_or_movie(media_type, title) == "season":
@@ -70,7 +71,7 @@ def handle_media(data: dict, item_id: str) -> dict:
             }
         else:
             media_link = None
-        technical_details = get_jellyfin_media_details(item_id)
+        technical_details = get_jellyfin_media_details(item_id, user_id)
         message = format_message(formatted_title, "", media_link, None, technical_details)
     elif is_season_ep_or_movie(media_type, title) == "serie":
         # It's a series or other (documentary for example)
@@ -89,7 +90,7 @@ def handle_media(data: dict, item_id: str) -> dict:
                 "imdb": f"https://imdb.com/title/{imdb}" if imdb else None,
                 "tmdb": f"https://tmdb.org/{media_type}/{tmdb}" if tmdb else (f"{imdb_to_tmdb(imdb)}" if imdb else None)
             }
-            technical_details = get_jellyfin_media_details(item_id)
+            technical_details = get_jellyfin_media_details(item_id, user_id)
             message = format_message(formatted_title, overview, media_link, trailer, technical_details)
             send_image = True
 

@@ -149,12 +149,13 @@ def is_season_ep_or_movie(media_type: str, title: str) -> str:
             return "serie"
     return None
 
-def get_jellyfin_media_details(item_id: str) -> dict:
+def get_jellyfin_media_details(item_id: str, user_id: str) -> dict:
     """
     Get media details from Jellyfin API.
 
     Args:
         item_id (str): The ID of the media item in Jellyfin.
+        user_id (str): The ID of the user.
 
     Returns:
         dict: A dictionary containing formatted technical details of the media.
@@ -163,10 +164,14 @@ def get_jellyfin_media_details(item_id: str) -> dict:
         logging.warning("Jellyfin API URL or Key is not set. Skipping Jellyfin details.")
         return {}
 
+    if not user_id:
+        logging.warning("User ID is not provided. Skipping Jellyfin details.")
+        return {}
+
     headers = {
         'X-Emby-Token': JELLYFIN_API_KEY
     }
-    url = f"{JELLYFIN_API_URL}/Items/{item_id}"
+    url = f"{JELLYFIN_API_URL}/Users/{user_id}/Items/{item_id}"
 
     try:
         response = requests.get(url, headers=headers, timeout=10)
