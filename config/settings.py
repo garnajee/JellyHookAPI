@@ -15,3 +15,6 @@ LANGUAGE2 = os.getenv("LANGUAGE2", "en-US")
 # Base URL for TMDB API
 BASE_URL = "https://api.themoviedb.org/3"
 
+# Jellyfin API configuration
+JELLYFIN_API_URL = os.getenv("JELLYFIN_API_URL")
+JELLYFIN_API_KEY = os.getenv("JELLYFIN_API_KEY")

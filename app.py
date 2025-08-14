@@ -51,10 +51,11 @@ def receive_data():
     title = data.get('title', '')
     imdb = data.get('imdb', '')
     tmdb = data.get('tmdb', '')
+    item_id = data.get('item_id', '')
 
     try:
         if media_type and title:
-            result = handle_media(data)
+            result = handle_media(data, item_id)
             message = result['message']
             send_image = result['send_image']
             picture_path = result['picture_path']

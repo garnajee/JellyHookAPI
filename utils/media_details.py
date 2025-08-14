@@ -2,7 +2,7 @@
 import requests
 import re
 import logging
-from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL
+from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL, JELLYFIN_API_URL, JELLYFIN_API_KEY
 
 def get_tmdb_details(media_type: str, tmdbid: str, language: str = LANGUAGE) -> dict:
     """
@@ -148,6 +148,77 @@ def is_season_ep_or_movie(media_type: str, title: str) -> str:
         else:
             return "serie"
     return None
+
+def get_jellyfin_media_details(item_id: str) -> dict:
+    """
+    Get media details from Jellyfin API.
+
+    Args:
+        item_id (str): The ID of the media item in Jellyfin.
+
+    Returns:
+        dict: A dictionary containing formatted technical details of the media.
+    """
+    if not JELLYFIN_API_URL or not JELLYFIN_API_KEY:
+        logging.warning("Jellyfin API URL or Key is not set. Skipping Jellyfin details.")
+        return {}
+
+    headers = {
+        'X-Emby-Token': JELLYFIN_API_KEY,
+        'Content-Type': 'application/json'
+    }
+    url = f"{JELLYFIN_API_URL}/Items/{item_id}"
+
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        media_streams = data.get('MediaStreams', [])
+        if not media_streams:
+            return {}
+
+        details = {
+            'video': {},
+            'audio': [],
+            'subtitles': []
+        }
+
+        # Video details
+        video_stream = next((s for s in media_streams if s.get('Type') == 'Video'), None)
+        if video_stream:
+            details['video']['resolution'] = f"{video_stream.get('Height', 'N/A')}p"
+            details['video']['codec'] = video_stream.get('Codec', 'N/A').upper()
+            details['video']['hdr'] = "HDR" if video_stream.get('VideoRange') == 'HDR' else "SDR"
+
+        # Audio details
+        for stream in media_streams:
+            if stream.get('Type') == 'Audio':
+                audio_info = f"{stream.get('DisplayTitle', 'N/A')}"
+                if stream.get('Language'):
+                    audio_info += f" ({stream.get('Language').upper()})"
+                details['audio'].append(audio_info)
+
+        # Subtitle details
+        for stream in media_streams:
+            if stream.get('Type') == 'Subtitle':
+                sub_info = f"{stream.get('DisplayTitle', 'N/A')}"
+                if stream.get('Language'):
+                    sub_info = f"{stream.get('Language').upper()}"
+                details['subtitles'].append(sub_info)
+
+        # Handle empty lists
+        if not details['audio']:
+            details.pop('audio')
+        if not details['subtitles']:
+            details.pop('subtitles')
+
+        return details
+
+    except requests.RequestException as e:
+        logging.error(f"Error fetching Jellyfin media details for item {item_id}: {e}")
+        return {}
+
 
 if __name__ == "__main__":
     media_type = "movie"

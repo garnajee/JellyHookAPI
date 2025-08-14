@@ -38,24 +38,45 @@ def format_message_for_discord(message: dict, options: dict) -> dict:
     if "tmdb" in links:
         link_text += f"\n[TMDb]({links['tmdb']})"
 
-    data = {
-      "content": "",
-      "embeds": [
-        {
-          "title": message.get("title", "Notification"),
-          "description": message.get("description","")+link_text+trailer_text,
-          "color": 3447003,  # light blue
-          "footer": {
-              "text": datetime.now().strftime("%H:%M - %d/%m/%Y")
-            }
+    embed = {
+        "title": message.get("title", "Notification"),
+        "description": message.get("description","")+link_text+trailer_text,
+        "color": 3447003,  # light blue
+        "fields": [],
+        "footer": {
+            "text": datetime.now().strftime("%H:%M - %d/%m/%Y")
         }
-      ]
+    }
+
+    technical_details = message.get("technical_details")
+    if technical_details:
+        details_text = ""
+        if 'video' in technical_details:
+            video = technical_details['video']
+            details_text += f"**Video:** {video.get('resolution', 'N/A')} | {video.get('codec', 'N/A')} | {video.get('hdr', 'N/A')}\n"
+
+        if 'audio' in technical_details:
+            audio_tracks = " | ".join(technical_details['audio'])
+            details_text += f"**Audio:** {audio_tracks}\n"
+
+        if 'subtitles' in technical_details and technical_details['subtitles']:
+            subtitle_tracks = " | ".join(technical_details['subtitles'])
+            details_text += f"**Subtitles:** {subtitle_tracks}"
+
+        if details_text:
+            embed["fields"].append({
+                "name": "Technical Details",
+                "value": details_text.strip(),
+                "inline": False
+            })
+
+    data = {
+        "content": "",
+        "embeds": [embed]
     }
 
     if options.get('send_image') and options.get('picture_path'):
-        #data["embeds"][0]["thumbnail"] = {"url": f"attachment://{options['picture_path']}"}
         data["embeds"][0]["image"] = {"url": f"attachment://{os.path.basename(options['picture_path'])}"}
-        #data["embeds"][0]["image"] = {"url": f"attachment://{options['picture_path']}"}
 
     return data
 

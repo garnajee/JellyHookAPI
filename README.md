@@ -38,7 +38,7 @@ JellyHookAPI is a flexible and extensible API that allows you to receive notific
 
 JellyHookAPI can receive media notifications and forward markdown-formatted messages with media details and trailers to services like WhatsApp. 
 
-For instance, when a new movie is added to your media server, after receiving notification from Jellyfin, JellyHookAPI can send a detailed message including the movie title, overview, IMDb and TMDb links, and trailer links to your preferred communication platforms.
+For instance, when a new movie is added to your media server, after receiving notification from Jellyfin, JellyHookAPI can send a detailed message including the movie title, overview, IMDb/TMDb links, and trailer links. It can also be configured to connect to your Jellyfin API to add technical details such as video resolution, audio tracks, and subtitles directly into the notification.
 
 ---
 
@@ -59,6 +59,7 @@ Total Supported Services: **3**
 
 - Docker and Docker Compose
 - TMDB API Key ([it's free](https://www.themoviedb.org/signup))
+- Jellyfin API Key (see Jellyfin Configuration section)
 
 ---
 
@@ -112,6 +113,11 @@ You must first configure Jellyfin, then configure the connector(s) you want to u
 
 ### 1. Jellyfin Configuration
 
+In addition to configuring the webhook, you also need to generate an API key in Jellyfin and set the `JELLYFIN_API_URL` and `JELLYFIN_API_KEY` variables in your `.env` file.
+
+1.  **Generate API Key**: In Jellyfin, go to **Dashboard > API Keys**, click the `+` sign, give it a name (e.g., `jellyhookapi`), and save. Copy the generated key.
+2.  **Set Environment Variables**: In your `.env` file, set `JELLYFIN_API_URL` to your Jellyfin server's address (e.g., `http://192.168.1.10:8096`) and `JELLYFIN_API_KEY` to the key you just generated.
+
 You need to install the ["Webhook plugin"](https://github.com/jellyfin/jellyfin-plugin-webhook).
 
 In your Jellyfin Web UI:
@@ -122,7 +128,7 @@ In your Jellyfin Web UI:
    - **Webhook Name**: Choose a name.
    - **Webhook URL**: Use the URL provided by `jellyhookapi` (Depending your docker network configuraion, e.g: `http://10.10.66.198:7778/api`
    - **Notification Type**: Select **Item Added**.
-   - **Template**: Use the following code:
+   - **Template**: Use the following code. This version adds the `item_id` required to fetch technical details.
 
 ```
 {
@@ -145,6 +151,7 @@ In your Jellyfin Web UI:
     ",
   "imdb": "{{Provider_imdb}}",
   "tmdb": "{{Provider_tmdb}}",
+  "item_id": "{{ItemId}}",
   "watch_link": "{{ServerUrl}}/web/index.html#!/details?id={{ItemId}}&serverId={{ServerId}}"
 }
 ```

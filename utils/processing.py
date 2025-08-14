@@ -4,17 +4,18 @@ import re
 import os
 import logging
 from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL
-from utils.media_details import get_tmdb_details, imdb_to_tmdb, get_trailer_link
+from utils.media_details import get_tmdb_details, imdb_to_tmdb, get_trailer_link, get_jellyfin_media_details
 from utils.download import download_and_get_poster_by_id
 
 #logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s')
 
-def handle_media(data: dict) -> dict:
+def handle_media(data: dict, item_id: str) -> dict:
     """
     Manage media data and format the message.
 
     Args:
         data (dict): The media data from Jellyfin.
+        item_id (str): The Jellyfin item ID.
 
     Returns:
         dict: The formatted message and options.
@@ -50,10 +51,8 @@ def handle_media(data: dict) -> dict:
             "imdb": f"https://imdb.com/title/{imdb}" if imdb else None,
             "tmdb": f"https://tmdb.org/{media_type}/{tmdb}" if tmdb else None
         }
-        #imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
-        #tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}"
-        #media_link = imdb_link + "\n" + tmdb_link
-        message = format_message(formatted_title, overview, media_link, trailer)
+        technical_details = get_jellyfin_media_details(item_id)
+        message = format_message(formatted_title, overview, media_link, trailer, technical_details)
         send_image = True
     elif is_season_ep_or_movie(media_type, title) == "season":
         # It's a season
@@ -69,12 +68,10 @@ def handle_media(data: dict) -> dict:
                 "imdb": f"https://imdb.com/title/{imdb}",
                 "tmdb": f"{imdb_to_tmdb(imdb)}"
             }
-            #imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
-            #tmdb_link = f"• TMDb: {imdb_to_tmdb(imdb)}"
-            #media_link = imdb_link + "\n" + tmdb_link
         else:
             media_link = None
-        message = format_message(formatted_title, "", media_link, None)
+        technical_details = get_jellyfin_media_details(item_id)
+        message = format_message(formatted_title, "", media_link, None, technical_details)
     elif is_season_ep_or_movie(media_type, title) == "serie":
         # It's a series or other (documentary for example)
         if not tmdb and not imdb:
@@ -92,10 +89,8 @@ def handle_media(data: dict) -> dict:
                 "imdb": f"https://imdb.com/title/{imdb}" if imdb else None,
                 "tmdb": f"https://tmdb.org/{media_type}/{tmdb}" if tmdb else (f"{imdb_to_tmdb(imdb)}" if imdb else None)
             }
-            #imdb_link = f"• IMDb: https://imdb.com/title/{imdb}"
-            #tmdb_link = f"• TMDb: https://tmdb.org/{media_type}/{tmdb}" if tmdb else f"• TMDb: {imdb_to_tmdb(imdb)}"
-            #media_link = imdb_link + "\n" + tmdb_link
-            message = format_message(formatted_title, overview, media_link, trailer)
+            technical_details = get_jellyfin_media_details(item_id)
+            message = format_message(formatted_title, overview, media_link, trailer, technical_details)
             send_image = True
 
     return {"message": message, "send_image": send_image, "picture_path": picture_path}
@@ -188,7 +183,7 @@ def is_season_ep_or_movie(media_type: str, title: str) -> str:
             return "serie"
     return None
 
-def format_message(title: str, overview: str, media_link: dict = None, trailer: list = None) -> dict:
+def format_message(title: str, overview: str, media_link: dict = None, trailer: list = None, technical_details: dict = None) -> dict:
     """
     Format the message to be sent.
 
@@ -197,6 +192,7 @@ def format_message(title: str, overview: str, media_link: dict = None, trailer: 
         overview (str): The synopsis of the media.
         media_link (dict): The links to the media (IMDb, TMDb).
         trailer (list, optional): The link(s) to the trailer.
+        technical_details (dict, optional): The technical details of the media.
 
     Returns:
         dict: The formatted message.
@@ -205,7 +201,8 @@ def format_message(title: str, overview: str, media_link: dict = None, trailer: 
         "title": title,
         "description": overview,
         "media_link": media_link,
-        "trailer": trailer
+        "trailer": trailer,
+        "technical_details": technical_details
     }
     return message
 
