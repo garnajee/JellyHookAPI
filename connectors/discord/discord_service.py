@@ -13,7 +13,7 @@ DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 def format_message_for_discord(message: dict, options: dict) -> dict:
     """
-    Format the message for Discord
+    Format the message for Discord with improved technical details layout.
 
     Args:
         message (dict): Message to send
@@ -22,7 +22,6 @@ def format_message_for_discord(message: dict, options: dict) -> dict:
     Returns:
         dict: The formatted payload for Discord.
     """
-
     trailers = message.get("trailer", [])
     if len(trailers) == 1:
         trailer_text = f"\n[Trailer]({trailers[0]})"
@@ -34,13 +33,13 @@ def format_message_for_discord(message: dict, options: dict) -> dict:
     links = message.get("media_link", {})
     link_text = ""
     if "imdb" in links:
-        link_text += f"\n\n[IMDb]({links['imdb']})"
+        link_text += f"\n[IMDb]({links['imdb']})"
     if "tmdb" in links:
         link_text += f"\n[TMDb]({links['tmdb']})"
 
     embed = {
         "title": message.get("title", "Notification"),
-        "description": message.get("description","")+link_text+trailer_text,
+        "description": message.get("description","") + "\n" + link_text.strip() + "\n" + trailer_text.strip(),
         "color": 3447003,  # light blue
         "fields": [],
         "footer": {
@@ -50,23 +49,26 @@ def format_message_for_discord(message: dict, options: dict) -> dict:
 
     technical_details = message.get("technical_details")
     if technical_details:
-        details_text = ""
+        details_lines = []
+        
         if 'video' in technical_details:
             video = technical_details['video']
-            details_text += f"**Video:** {video.get('resolution', 'N/A')} | {video.get('codec', 'N/A')} | {video.get('hdr', 'N/A')}\n"
+            video_line = f"🎥 **Vidéo :** {video.get('resolution', 'N/A')} | {video.get('codec', 'N/A')} | {video.get('hdr', 'N/A')}"
+            details_lines.append(video_line)
 
-        if 'audio' in technical_details:
-            audio_tracks = " | ".join(technical_details['audio'])
-            details_text += f"**Audio:** {audio_tracks}\n"
+        if 'audio' in technical_details and technical_details['audio']:
+            audio_tracks_str = " | ".join(technical_details['audio'])
+            details_lines.append(f"🔊 **Audio :** {audio_tracks_str}")
 
         if 'subtitles' in technical_details and technical_details['subtitles']:
-            subtitle_tracks = " | ".join(technical_details['subtitles'])
-            details_text += f"**Subtitles:** {subtitle_tracks}"
+            subtitle_tracks_str = " | ".join(technical_details['subtitles'])
+            details_lines.append(f"💬 **Sous-titres :** {subtitle_tracks_str}")
 
-        if details_text:
+
+        if details_lines:
             embed["fields"].append({
-                "name": "Technical Details",
-                "value": details_text.strip(),
+                "name": "Détails Techniques",
+                "value": "\n".join(details_lines),
                 "inline": False
             })
 

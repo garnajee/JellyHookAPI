@@ -25,33 +25,55 @@ def format_message(message: dict) -> str:
     """
 
     try:
-        trailers = message.get("trailer",[])
-        if trailers is None:
-            trailers = []
-        if len(trailers) == 1:
-            trailer_text = f"\n[Trailer]({trailers[0]})"
-        elif len(trailers) == 2:
-            trailer_text = f"\n[Trailer FR]({trailers[0]})\n[Trailer EN]({trailers[1]})"
-        else:
-            trailer_text = ""
+        message_parts = []
 
-        links = message.get("media_link", {})
-        if links is None:
-            links = {}
-        link_text = ""
-        if "imdb" in links:
-            link_text += f"\n[IMDb]({links['imdb']})"
-        if "tmdb" in links:
-            link_text += f"\n[TMDb]({links['tmdb']})"
+        if message.get('title'):
+            message_parts.append(f"#{message.get('title')}")
 
-        formatted_message = f"#{message.get('title')}\n"
+        technical_details = message.get("technical_details")
+        if technical_details:
+            tech_info_parts = []
+            
+            if 'video' in technical_details:
+                video = technical_details['video']
+                video_str = f"🎥 {video.get('resolution', '')} | {video.get('codec', '')} | {video.get('hdr', '')}"
+                tech_info_parts.append(video_str)
+
+            if 'audio' in technical_details and technical_details['audio']:
+                audio_str = f"🔊 {' | '.join(technical_details['audio'])}"
+                tech_info_parts.append(audio_str)
+                
+            if 'subtitles' in technical_details and technical_details['subtitles']:
+                subs_str = f"💬 {' | '.join(technical_details['subtitles'])}"
+                tech_info_parts.append(subs_str)
+            
+            if tech_info_parts:
+                message_parts.append(f"\n> {'  •  '.join(tech_info_parts)}")
+
         if message.get('description'):
-            formatted_message += f"```{message.get('description')}```\n"
-        formatted_message += link_text
-        formatted_message += trailer_text
-        return formatted_message
+            message_parts.append(f"\n```{message.get('description')}```")
+
+        links_section = []
+        links = message.get("media_link", {})
+        if "imdb" in links:
+            links_section.append(f"[IMDb]({links['imdb']})")
+        if "tmdb" in links:
+            links_section.append(f"[TMDb]({links['tmdb']})")
+
+        trailers = message.get("trailer", [])
+        if len(trailers) == 1:
+            links_section.append(f"[Trailer]({trailers[0]})")
+        elif len(trailers) == 2:
+            links_section.append(f"[Trailer FR]({trailers[0]})")
+            links_section.append(f"[Trailer EN]({trailers[1]})")
+        
+        if links_section:
+            message_parts.append("\n" + "\n".join(links_section))
+
+        return "\n".join(message_parts)
+
     except Exception as e:
-        logging.error(f"Error formatting message: {e}")
+        logging.error(f"Error formatting message for Matrix: {e}")
         return ""
 
 def html_format_message(message: dict) -> str:
