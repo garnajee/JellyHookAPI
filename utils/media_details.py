@@ -2,7 +2,7 @@
 import requests
 import re
 import logging
-from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL, JELLYFIN_API_URL, JELLYFIN_API_KEY
+from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL, JELLYFIN_API_URL, JELLYFIN_API_KEY, JELLYFIN_USER_ID
 
 def get_tmdb_details(media_type: str, tmdbid: str, language: str = LANGUAGE) -> dict:
     """
@@ -149,29 +149,24 @@ def is_season_ep_or_movie(media_type: str, title: str) -> str:
             return "serie"
     return None
 
-def get_jellyfin_media_details(item_id: str, user_id: str) -> dict:
+def get_jellyfin_media_details(item_id: str) -> dict:
     """
     Get media details from Jellyfin API.
 
     Args:
         item_id (str): The ID of the media item in Jellyfin.
-        user_id (str): The ID of the user.
 
     Returns:
         dict: A dictionary containing formatted technical details of the media.
     """
-    if not JELLYFIN_API_URL or not JELLYFIN_API_KEY:
-        logging.warning("Jellyfin API URL or Key is not set. Skipping Jellyfin details.")
-        return {}
-
-    if not user_id:
-        logging.warning("User ID is not provided. Skipping Jellyfin details.")
+    if not all([JELLYFIN_API_URL, JELLYFIN_API_KEY, JELLYFIN_USER_ID]):
+        logging.warning("Jellyfin API URL, Key, or User ID is not set. Skipping Jellyfin details.")
         return {}
 
     headers = {
         'X-Emby-Token': JELLYFIN_API_KEY
     }
-    url = f"{JELLYFIN_API_URL}/Users/{user_id}/Items/{item_id}"
+    url = f"{JELLYFIN_API_URL}/Users/{JELLYFIN_USER_ID}/Items/{item_id}"
 
     try:
         response = requests.get(url, headers=headers, timeout=10)

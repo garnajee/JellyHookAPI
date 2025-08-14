@@ -113,22 +113,26 @@ You must first configure Jellyfin, then configure the connector(s) you want to u
 
 ### 1. Jellyfin Configuration
 
-In addition to configuring the webhook, you also need to generate an API key in Jellyfin and set the `JELLYFIN_API_URL` and `JELLYFIN_API_KEY` variables in your `.env` file.
+To allow `JellyHookAPI` to fetch technical details, you need to provide it with access to your Jellyfin server.
 
-1.  **Generate API Key**: In Jellyfin, go to **Dashboard > API Keys**, click the `+` sign, give it a name (e.g., `jellyhookapi`), and save. Copy the generated key.
-2.  **Set Environment Variables**: In your `.env` file, set `JELLYFIN_API_URL` to your Jellyfin server's address (e.g., `http://192.168.1.10:8096`) and `JELLYFIN_API_KEY` to the key you just generated.
+1.  **Generate an API Key**: In your Jellyfin Dashboard, go to **API Keys**, click the **+** sign, give it a name (e.g., `jellyhookapi`), and save. Copy the generated key.
+2.  **Find your User ID**: In the Jellyfin Dashboard, go to **Users**, click on your user profile, and copy the ID from the page's URL (it's the string of letters and numbers at the end).
+3.  **Set Environment Variables**: In your `.env` file, set the following variables:
+    -   `JELLYFIN_API_URL`: The full URL to your Jellyfin server (e.g., `http://192.168.1.10:8096`).
+    -   `JELLYFIN_API_KEY`: The API key you generated.
+    -   `JELLYFIN_USER_ID`: The User ID you found.
 
-You need to install the ["Webhook plugin"](https://github.com/jellyfin/jellyfin-plugin-webhook).
+You also need to install the ["Webhook plugin"](https://github.com/jellyfin/jellyfin-plugin-webhook).
 
 In your Jellyfin Web UI:
 
-1. Go to **Extensions** > **Catalogue** > **Webhook**: install it and restart Jellyfin.
-2. Go back to **My extensions** > **Webhook** > **Add Generic Destination**
+1. Go to **Dashboard > Plugins** > **Catalogue** > **Webhook**: install it and restart Jellyfin.
+2. Go back to **Plugins** > **Webhook** > **Add Generic Destination**.
 3. Fill in the following details:
-   - **Webhook Name**: Choose a name.
-   - **Webhook URL**: Use the URL provided by `jellyhookapi` (Depending your docker network configuraion, e.g: `http://10.10.66.198:7778/api`
+   - **Webhook Name**: Choose a name (e.g., `jellyhookapi`).
+   - **Webhook URL**: Use the URL for `jellyhookapi` (e.g., `http://jellyhookapi:7778/api`).
    - **Notification Type**: Select **Item Added**.
-   - **Template**: Use the following code. This version adds the `item_id` and `user_id` required to fetch technical details.
+   - **Template**: Use the following code. This ensures the `ItemId` is sent, which is required to fetch technical details.
 
 ```
 {
@@ -152,7 +156,6 @@ In your Jellyfin Web UI:
   "imdb": "{{Provider_imdb}}",
   "tmdb": "{{Provider_tmdb}}",
   "item_id": "{{ItemId}}",
-  "user_id": "{{UserId}}",
   "watch_link": "{{ServerUrl}}/web/index.html#!/details?id={{ItemId}}&serverId={{ServerId}}"
 }
 ```

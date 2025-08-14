@@ -18,3 +18,4 @@ BASE_URL = "https://api.themoviedb.org/3"
 # Jellyfin API configuration
 JELLYFIN_API_URL = os.getenv("JELLYFIN_API_URL")
 JELLYFIN_API_KEY = os.getenv("JELLYFIN_API_KEY")
+JELLYFIN_USER_ID = os.getenv("JELLYFIN_USER_ID")
