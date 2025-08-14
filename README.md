@@ -174,6 +174,18 @@ When a new episode is added, you will receive a notification, but if you want to
 
 ---
 
+## Testing
+
+This project includes unit tests to ensure the reliability of its components. To run the tests, navigate to the root directory of the project and execute the following command:
+
+```sh
+python3 -m unittest discover tests
+```
+
+This will automatically discover and run all tests located in the `tests` directory.
+
+---
+
 ## Contributing
 
 I'd be happy to welcome contributions to JellyHookAPI! To contribute:
