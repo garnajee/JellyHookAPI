@@ -149,9 +149,36 @@ def is_season_ep_or_movie(media_type: str, title: str) -> str:
             return "serie"
     return None
 
+def analyze_french_version(display_title: str, language_code: str) -> str:
+    """
+    Analyzes the display title and language code to determine if it's VFF or VFQ.
+
+    Args:
+        display_title (str): The display title of the stream (e.g., "Français (TrueFrench) DTS-HD MA 5.1").
+        language_code (str): The 3-letter language code (e.g., "fre").
+
+    Returns:
+        str: A formatted language label (e.g., "FR (VFF)", "FR (VFQ)", or the original code).
+    """
+    lang_code_upper = (language_code or "").upper()
+    if lang_code_upper not in ['FRE', 'FRA']:
+        return lang_code_upper
+
+    title_lower = (display_title or "").lower()
+
+    keywords_vfq = ['vfq', 'fr-ca', 'ca', 'canadian', 'canadien']
+    keywords_vff = ['vff', 'truefrench', 'fr-fr', 'european', "vfi", "france"]
+
+    if any(keyword in title_lower for keyword in keywords_vfq):
+        return "🇨🇦 VFQ"
+    
+    if any(keyword in title_lower for keyword in keywords_vff):
+        return "🇫🇷 VFF"
+    return "FR"
+
 def get_jellyfin_media_details(item_id: str) -> dict:
     """
-    Get media details from Jellyfin API.
+    Get media details from Jellyfin API, with enhanced French version detection.
 
     Args:
         item_id (str): The ID of the media item in Jellyfin.
@@ -188,23 +215,31 @@ def get_jellyfin_media_details(item_id: str) -> dict:
         if video_stream:
             details['video']['resolution'] = f"{video_stream.get('Height', 'N/A')}p"
             details['video']['codec'] = video_stream.get('Codec', 'N/A').upper()
-            details['video']['hdr'] = "HDR" if video_stream.get('VideoRange') == 'HDR' else "SDR"
+            details['video']['hdr'] = "HDR" if video_stream.get('VideoRange') == 'HDR'
 
         # Audio details
         for stream in media_streams:
             if stream.get('Type') == 'Audio':
-                audio_info = f"{stream.get('DisplayTitle', 'N/A')}"
-                if stream.get('Language'):
-                    audio_info += f" ({stream.get('Language').upper()})"
-                details['audio'].append(audio_info)
-
+                language_label = analyze_french_version(
+                    stream.get('DisplayTitle'), 
+                    stream.get('Language')
+                )
+                details['audio'].append(language_label)
+                
         # Subtitle details
         for stream in media_streams:
             if stream.get('Type') == 'Subtitle':
-                sub_info = f"{stream.get('DisplayTitle', 'N/A')}"
-                if stream.get('Language'):
-                    sub_info = f"{stream.get('Language').upper()}"
-                details['subtitles'].append(sub_info)
+                language_label = analyze_french_version(
+                    stream.get('DisplayTitle'), 
+                    stream.get('Language')
+                )
+                details['subtitles'].append(language_label)
+                
+        # Handle duplicates
+        if details['audio']:
+            details['audio'] = list(dict.fromkeys(details['audio']))
+        if details['subtitles']:
+            details['subtitles'] = list(dict.fromkeys(details['subtitles']))
 
         # Handle empty lists
         if not details['audio']:
@@ -217,7 +252,6 @@ def get_jellyfin_media_details(item_id: str) -> dict:
     except requests.RequestException as e:
         logging.error(f"Error fetching Jellyfin media details for item {item_id}: {e}")
         return {}
-
 
 if __name__ == "__main__":
     media_type = "movie"
