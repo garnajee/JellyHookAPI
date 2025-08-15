@@ -1,0 +1,18 @@
+{
+  "Name": "Planet Earth II",
+  "Id": "docu101",
+  "MediaStreams": [
+    {
+      "Type": "Video",
+      "Codec": "h264",
+      "Width": 1280,
+      "Height": 720,
+      "VideoRange": "SDR"
+    },
+    {
+      "Type": "Audio",
+      "Language": "fre",
+      "DisplayTitle": "Français (VFF) Stereo"
+    }
+  ]
+}
