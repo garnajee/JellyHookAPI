@@ -203,27 +203,6 @@ def format_message(title: str, overview: str, media_link: dict = None, trailer: 
     }
     return message
 
-def send_to_all_connectors(connectors:dict, message: dict, options: dict):
-    """
-    Send the formatted message to all connectors.
-
-    Args:
-        connectors (dict): The loaded connectors
-        message (dict): Message to be sent.
-        options (dict): Additional options for the message
-    """
-    if not message:  # if message is None or empty
-        logging.warning("No message to send. Skipping sending to connectors.")
-        return
-
-    for connector_name, connector_module in connectors.items():
-        try:
-            response = connector_module.send_message(message, options)
-            if response:
-                logging.info(f"Message sent to {connector_name} successfully.")
-        except Exception as e:
-            logging.error(f"Failed to send message to {connector_name}: {e}")
-
 if __name__ == "__main__":
     # Example usage of handle_media function
     data = {
@@ -246,6 +225,6 @@ if __name__ == "__main__":
             'send_message': lambda message, options: print(f"Sending via Slack: {message}, options: {options}")
         }
     }
-    send_to_all_connectors(connectors, message, options)
+    #send_to_all_connectors(connectors, message, options)
 
 
