@@ -99,13 +99,28 @@ mv .env.example .env
 # Open it with your prefered editor to set the variables
 ```
 
-### Docker Setup
+### Docker Setup (Recommended for Production)
 
 Ensure Docker and Docker Compose are installed. Use the following command to build and run the application:
 
 ```sh
 docker-compose up -d
 ```
+
+### Local Development (without Docker)
+
+If you want to run the application without Docker for development purposes, you can follow these steps:
+
+1.  **Install dependencies:**
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+2.  **Run the application with Gunicorn:**
+    ```sh
+    gunicorn --workers 4 --bind 0.0.0.0:7778 app:app
+    ```
+    The application will be available at `http://localhost:7778`.
 
 ---
 

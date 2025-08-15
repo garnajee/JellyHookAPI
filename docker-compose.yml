@@ -1,0 +1,25 @@
+services:
+  jellyhookapi:
+    container_name: jellyhookapi
+    restart: always
+    image: python:alpine
+    working_dir: /app
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: sh -c "pip install --no-cache-dir -r requirements.txt && gunicorn --workers 4 --bind 0.0.0.0:7778 app:app"
+    ports:
+      - ${DOCKER_BIND_ADDR}:${DOCKER_PORT}:7778
+#    networks:
+#      net-chill:
+#        ipv4_address: 10.10.66.198
+#
+#networks:
+#  net-chill:
+#    external: true
+#    driver: bridge
+#    ipam:
+#      config:
+#        - subnet: 10.10.66.0/24
+
