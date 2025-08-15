@@ -28,7 +28,7 @@ def format_message(message: dict) -> str:
         message_parts = []
 
         if message.get('title'):
-            message_parts.append(f"#{message.get('title')}")
+            message_parts.append(f"*{message.get('title')}*")
 
         technical_details = message.get("technical_details")
         if technical_details:
