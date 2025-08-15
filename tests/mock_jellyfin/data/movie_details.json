@@ -1,0 +1,28 @@
+{
+  "Name": "Inception",
+  "Id": "movie123",
+  "MediaStreams": [
+    {
+      "Type": "Video",
+      "Codec": "h264",
+      "Width": 1920,
+      "Height": 1080,
+      "VideoRange": "SDR"
+    },
+    {
+      "Type": "Audio",
+      "Language": "fre",
+      "DisplayTitle": "Français (TrueFrench) DTS-HD MA 5.1"
+    },
+    {
+      "Type": "Audio",
+      "Language": "eng",
+      "DisplayTitle": "English DTS-HD MA 5.1"
+    },
+    {
+      "Type": "Subtitle",
+      "Language": "fre",
+      "DisplayTitle": "Français (Forced)"
+    }
+  ]
+}

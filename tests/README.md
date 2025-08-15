@@ -1,67 +1,88 @@
-# Manual Integration Testing Guide
+# Integration Testing Guide with Mock Server
 
-This document provides instructions for setting up an environment for manual end-to-end testing of JellyHookAPI with a live Jellyfin server.
+This document provides instructions for setting up a local testing environment for JellyHookAPI using a "mock" server to simulate Jellyfin API responses.
 
-**Note:** These are not automated tests. The main project `README.md` refers to a command for running unit tests (`python3 -m unittest discover tests`), but this repository currently does not contain any automated test files. The instructions below are for manual verification only.
+This approach is lighter and faster than running a full Jellyfin server.
 
 ## Prerequisites
 
 - Docker and Docker Compose
-- A cloned version of this JellyHookAPI repository.
-- A sample movie file to add to the Jellyfin library.
+- A cloned version of the JellyHookAPI repository.
+- `curl` installed on your machine.
 
-## Setup Instructions
+## How It Works
 
-The testing setup involves running two services in Docker: Jellyfin and JellyHookAPI itself.
+The test environment consists of two Docker services:
+1.  **`jellyhookapi`**: Your application, which listens for notifications on port `7778`.
+2.  **`mock_jellyfin`**: A small web server that simulates the Jellyfin API. When `jellyhookapi` requests details for an `item_id`, it will return a predefined JSON response.
 
-### 1. Prepare Jellyfin Folders
+Tests are triggered manually by sending `curl` requests to `jellyhookapi`, thereby simulating a notification sent by Jellyfin.
 
-You need to create local directories that will be mounted by the Jellyfin container for configuration and media.
+## 1. Environment Setup
 
-From the root of this repository, run:
-```sh
-mkdir -p tests/jellyfin_test_data/{config,data/movies}
-```
-This ensures the test-specific data for Jellyfin is contained within the `tests` directory.
+You need to configure two `.env` files: one for the API and one for the connector.
 
-### 2. Configure Environment Variables
+### a. JellyHookAPI
+Copy the `.env.example` file from the project root to a new file named `.env`.
+**Fill in the required values** (e.g., `TMDB_API_KEY`).
 
-You will need to configure two `.env` files:
-
-- **JellyHookAPI:** Copy the root `.env.example` to `.env` and fill in the required values (like `TMDB_API_KEY`). The Jellyfin URL should be `http://jellyfin:8096` to connect to the Jellyfin container.
-- **Connector:** Go to the connector directory you want to test (e.g., `connectors/discord/`), copy its `.env.example` to `.env`, and fill in the service-specific details (e.g., Discord webhook URL).
-
-### 3. Run Docker Compose
-
-To run the test environment, you will use two `docker-compose` files together. From the root of the repository, run:
-```sh
-docker-compose -f docker-compose.yml -f tests/docker-compose-jellyfin.yml up --build
-```
-This command starts both the JellyHookAPI service (from the main `docker-compose.yml`) and the Jellyfin test server (from `tests/docker-compose-jellyfin.yml`).
-
-### 4. Configure Jellyfin
-
-Once the containers are running, you need to set up Jellyfin and the webhook plugin:
-
-1.  Open your browser and navigate to the Jellyfin UI (e.g., `http://localhost:8097`).
-2.  Complete the initial Jellyfin setup wizard.
-3.  Install the **Webhook plugin** from `Dashboard > Plugins > Catalogue`. Restart Jellyfin when prompted.
-4.  Configure the webhook plugin (`Dashboard > Plugins > Webhook`) as described in the main [README.md](https://github.com/garnajee/JellyHookAPI#1-jellyfin-configuration), using `http://jellyhookapi:7778/api` as the Webhook URL.
-
-### 5. Trigger a Notification
-
-1.  Place your sample movie file into the `tests/jellyfin_test_data/data/movies` directory on your host machine.
-2.  In the Jellyfin Dashboard, go to `Scheduled Tasks`.
-3.  Run the **Scan Media Library** task to make Jellyfin detect the new file.
-4.  Once the scan is complete, run the **Webhook Notifier** task.
-
-You should receive a notification in the service you configured (e.g., Discord).
-
-### Cleaning Up
-
-To stop and remove the test containers, run:
-```sh
-docker-compose -f docker-compose.yml -f tests/docker-compose-jellyfin.yml down
+**The most important setting** is the Jellyfin URL. It must point to our mock server:
+```dotenv
+# .env file at the project root
+JELLYFIN_API_URL=http://mock_jellyfin:8096
+JELLYFIN_API_KEY=any_fake_key_will_work
+JELLYFIN_USER_ID=any_fake_user_id
+# ... other variables ...
+TMDB_API_KEY=YOUR_KEY_HERE
 ```
 
-To perform another test, you can remove the movie file from the media folder, re-scan the library, and then add it back to trigger the notification again.
+### b. Connector
+Go to the directory of the connector you want to test (e.g., `connectors/discord/`), copy its `env.example` to `.env`, and fill in the service-specific details (e.g., the Discord webhook URL).
+
+## 2. Launching the Test Environment
+
+From the root of the project, run the following command:
+```sh
+docker-compose -f tests/docker-compose.test.yml up --build
+```
+This command will build and start the `jellyhookapi` and `mock_jellyfin` containers. You should see the logs from both services in your terminal.
+
+## 3. Running the Tests
+
+Open a **new terminal window**.
+
+First, make the test scripts executable:
+```sh
+chmod +x tests/requests/*.sh
+```
+
+Next, run each script one by one to simulate different notifications:
+
+```sh
+# Test adding a movie
+./tests/requests/01_add_movie.sh
+
+# Test adding a 4K HDR episode
+./tests/requests/02_add_episode.sh
+
+# Test adding a season (should not call the Jellyfin API for details)
+./tests/requests/03_add_season.sh
+
+# Test adding a documentary
+./tests/requests/04_add_documentary.sh
+```
+
+### Expected Outcome
+
+For each script you run:
+1.  The terminal will display a confirmation that the request was sent.
+2.  In the terminal where `docker-compose` is running, you will see logs from `jellyhookapi` processing the request, and logs from `mock_jellyfin` showing it received a request for information.
+3.  You should receive a formatted notification in the service you configured (e.g., Discord).
+
+## 4. Cleaning Up
+
+To stop and remove the test containers, return to the terminal where `docker-compose` is running, press `Ctrl+C`, and then run:
+```sh
+docker-compose -f tests/docker-compose.test.yml down
+```
+

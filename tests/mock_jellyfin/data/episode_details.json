@@ -1,0 +1,23 @@
+{
+  "Name": "Pilot",
+  "Id": "episode456",
+  "MediaStreams": [
+    {
+      "Type": "Video",
+      "Codec": "hevc",
+      "Width": 3840,
+      "Height": 2160,
+      "VideoRange": "HDR"
+    },
+    {
+      "Type": "Audio",
+      "Language": "fre",
+      "DisplayTitle": "Français (VFQ) AC3 5.1"
+    },
+    {
+      "Type": "Audio",
+      "Language": "eng",
+      "DisplayTitle": "English AC3 5.1"
+    }
+  ]
+}

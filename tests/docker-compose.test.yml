@@ -1,0 +1,30 @@
+services:
+  jellyhookapi:
+    container_name: jellyhookapi
+    restart: always
+    image: python:alpine
+    working_dir: /app
+    volumes:
+      - ../:/app
+    command: sh -c "pip install --no-cache-dir -r requirements.txt && python app.py"
+    env_file:
+      - ../.env
+    ports:
+      - "7778:7778"
+    networks:
+      - jellyhook-test-net
+    depends_on:
+      - mock_jellyfin
+
+  mock_jellyfin:
+    container_name: mock_jellyfin
+    build:
+      context: ./mock_jellyfin
+    # No ports exposed to host, it's only for internal communication
+    networks:
+      - jellyhook-test-net
+
+networks:
+  jellyhook-test-net:
+    name: jellyhook-test-net
+    driver: bridge
