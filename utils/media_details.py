@@ -213,7 +213,23 @@ def get_jellyfin_media_details(item_id: str) -> dict:
         # Video details
         video_stream = next((s for s in media_streams if s.get('Type') == 'Video'), None)
         if video_stream:
-            details['video']['resolution'] = f"{video_stream.get('Height', 'N/A')}p"
+            width = video_stream.get('Width')
+            height = video_stream.get('Height')
+
+            resolution_label = ""
+            if width == 3840:
+                resolution_label = "2160p"
+            elif width == 1920:
+                resolution_label = "1080p"
+            elif width == 1280:
+                resolution_label = "720p"
+            else:
+                if height:
+                    resolution_label = f"{height}p"
+                else:
+                    resolution_label = "N/A"
+
+            details['video']['resolution'] = resolution_label
             details['video']['codec'] = video_stream.get('Codec', 'N/A').upper()
             if video_stream.get('VideoRange') == 'HDR':
                 details['video']['hdr'] = "HDR"
