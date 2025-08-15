@@ -19,3 +19,6 @@ BASE_URL = "https://api.themoviedb.org/3"
 JELLYFIN_API_URL = os.getenv("JELLYFIN_API_URL")
 JELLYFIN_API_KEY = os.getenv("JELLYFIN_API_KEY")
 JELLYFIN_USER_ID = os.getenv("JELLYFIN_USER_ID")
+
+# Notifications configuration
+SKIP_EPISODE_NOTIFICATIONS = os.getenv("SKIP_EPISODE_NOTIFICATIONS", "False").lower() == "true"

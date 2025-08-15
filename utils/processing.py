@@ -3,7 +3,7 @@
 import re
 import os
 import logging
-from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL
+from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL, SKIP_EPISODE_NOTIFICATIONS
 from utils.media_details import get_tmdb_details, imdb_to_tmdb, get_trailer_link, get_jellyfin_media_details
 from utils.download import download_and_get_poster_by_id
 
@@ -29,9 +29,6 @@ def handle_media(data: dict, item_id: str) -> dict:
     message = {}
     send_image = False
     picture_path = None
-
-    # if you want to skip episode notifications
-    skip_episode = False
 
     if is_season_ep_or_movie(media_type, title) == "movie":
         # It's a movie
@@ -60,7 +57,7 @@ def handle_media(data: dict, item_id: str) -> dict:
         season_number = re.search(r", Saison\s*([0-9]+)", title, flags=re.IGNORECASE).group(1)
         formatted_title = season_name + ", Saison " + season_number
         message = format_message(formatted_title, "", None, None)
-    elif not skip_episode and is_season_ep_or_movie(media_type, title) == "episode":
+    elif not SKIP_EPISODE_NOTIFICATIONS and is_season_ep_or_movie(media_type, title) == "episode":
         # It's an episode
         formatted_title = re.search(r"Episode-added:\s*(.*)", title, flags=re.IGNORECASE).group(1)
         if imdb:
