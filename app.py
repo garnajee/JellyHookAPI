@@ -4,7 +4,7 @@ import os
 import importlib
 import logging
 from flask import Flask, request, jsonify
-from utils.processing import handle_media, send_to_all_connectors
+from utils.processing import handle_media
 
 app = Flask(__name__)
 
@@ -34,6 +34,27 @@ def load_connectors():
     return connectors
 
 connectors = load_connectors()
+
+def send_to_all_connectors(connectors:dict, message: dict, options: dict):
+    """
+    Send the formatted message to all connectors.
+
+    Args:
+        connectors (dict): The loaded connectors
+        message (dict): Message to be sent.
+        options (dict): Additional options for the message
+    """
+    if not message:  # if message is None or empty
+        logging.warning("No message to send. Skipping sending to connectors.")
+        return
+
+    for connector_name, connector_module in connectors.items():
+        try:
+            response = connector_module.send_message(message, options)
+            if response:
+                logging.info(f"Message sent to {connector_name} successfully.")
+        except Exception as e:
+            logging.error(f"Failed to send message to {connector_name}: {e}")
 
 @app.after_request
 def add_security_headers(response):
