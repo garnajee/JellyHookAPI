@@ -35,6 +35,17 @@ def load_connectors():
 
 connectors = load_connectors()
 
+@app.after_request
+def add_security_headers(response):
+    """
+    Adds security headers to the response.
+    """
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    return response
+
 @app.route('/api', methods=['POST'])
 def receive_data():
     """
@@ -68,6 +79,4 @@ def receive_data():
         logging.error(f"Error handling media: {e}")
         return jsonify({'message': 'Internal server error'}), 500
 
-if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=7778)
 
