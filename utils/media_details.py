@@ -215,7 +215,8 @@ def get_jellyfin_media_details(item_id: str) -> dict:
         if video_stream:
             details['video']['resolution'] = f"{video_stream.get('Height', 'N/A')}p"
             details['video']['codec'] = video_stream.get('Codec', 'N/A').upper()
-            details['video']['hdr'] = "HDR" if video_stream.get('VideoRange') == 'HDR'
+            if video_stream.get('VideoRange') == 'HDR':
+                details['video']['hdr'] = "HDR"
 
         # Audio details
         for stream in media_streams:
