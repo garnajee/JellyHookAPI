@@ -40,6 +40,8 @@ JellyHookAPI can receive media notifications and forward markdown-formatted mess
 
 For instance, when a new movie is added to your media server, after receiving notification from Jellyfin, JellyHookAPI can send a detailed message including the movie title, overview, IMDb/TMDb links, and trailer links. It can also be configured to connect to your Jellyfin API to add technical details such as video resolution, audio tracks, and subtitles directly into the notification.
 
+A notable feature for French-speaking users is its ability to automatically detect and label French audio tracks as `VFF` (Version Française de France) or `VFQ` (Version Française Québécoise) based on metadata, providing more precise information about the available audio.
+
 ---
 
 ## Supported Services
@@ -172,9 +174,15 @@ JellyHookAPI is designed to be extensible through connectors. Each connector is 
 
 See this [README](connectors/whatsapp/README.md) for more informations.
 
-### 3. (Optionnal) - Disable notification for episode only
+### 3. (Optional) Disabling Episode Notifications
 
-When a new episode is added, you will receive a notification, but if you want to disable these notifications, simply change `skip_episode = False` to `True` in `utils/processing.py` line 33.
+If you prefer not to receive notifications for newly added episodes, you can disable them by setting the following variable in your `.env` file:
+
+```
+SKIP_EPISODE_NOTIFICATIONS=True
+```
+
+By default, episode notifications are enabled (`False`).
 
 ---
 
