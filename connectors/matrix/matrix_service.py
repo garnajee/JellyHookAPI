@@ -36,7 +36,7 @@ def format_message(message: dict) -> str:
         technical_details = message.get("technical_details")
         if technical_details:
             tech_info_parts = []
-            
+
             video = technical_details.get('video', {})
             if video:
                 video_str = f"🎥 {video.get('resolution', '')} | {video.get('codec', '')} | {video.get('hdr', '')}"
@@ -46,12 +46,12 @@ def format_message(message: dict) -> str:
             if audio_list:
                 audio_str = f"🔊 {' | '.join(audio_list)}"
                 tech_info_parts.append(audio_str)
-                
+
             subs_list = technical_details.get('subtitles')
             if subs_list:
                 subs_str = f"💬 {' | '.join(subs_list)}"
                 tech_info_parts.append(subs_str)
-            
+
             if tech_info_parts:
                 message_parts.append(f"\n> {'  •  '.join(tech_info_parts)}")
 
@@ -62,8 +62,12 @@ def format_message(message: dict) -> str:
         links = message.get("media_link", {}) or {}
         if "imdb" in links and links["imdb"]:
             links_section.append(f"[IMDb]({links['imdb']})")
+            # if your service does not support markdown link format, uncomment the next line
+            #links_section.append(f"• IMDb: {links['imdb']}")
         if "tmdb" in links and links["tmdb"]:
             links_section.append(f"[TMDb]({links['tmdb']})")
+            # if your service does not support markdown link format, uncomment the next line
+            #links_section.append(f"• TMDb: {links['tmdb']}")
 
         trailers = message.get("trailer") or []
         if len(trailers) == 1:
@@ -71,7 +75,10 @@ def format_message(message: dict) -> str:
         elif len(trailers) >= 2:
             links_section.append(f"[Trailer FR]({trailers[0]})")
             links_section.append(f"[Trailer EN]({trailers[1]})")
-        
+            # if your service does not support markdown link format, uncomment the next lines
+            #links_section.append(f"• Trailer FR: {trailers[0]}")
+            #links_section.append(f"• Trailer EN: {trailers[1]}")
+
         if links_section:
             message_parts.append("\n" + "\n".join(links_section))
 
@@ -94,7 +101,7 @@ def html_format_message(message: dict) -> str:
     try:
         if not message:
             return ""
-            
+
         trailers = message.get("trailer") or []
         if len(trailers) == 1:
             trailer_text = f'<br><a href="{trailers[0]}">Trailer</a>'
@@ -113,14 +120,14 @@ def html_format_message(message: dict) -> str:
         formatted_message = ""
         if message.get("title"):
              formatted_message += f'<h1>{message.get("title")}</h1><br/>'
-        
+
         if message.get('description'):
             formatted_message += f'<pre>{message.get("description")}</pre>'
-        
+
         formatted_message += link_text
         formatted_message += trailer_text
         return formatted_message
-        
+
     except Exception as e:
         logging.error(f"Error formatting message: {e}", exc_info=True)
         return ""
@@ -148,7 +155,7 @@ def upload_image(image_path: str) -> str:
         }
         with open(image_path, 'rb') as image_file:
             response = requests.post(url, headers=headers, data=image_file)
-        
+
         response.raise_for_status()
         return response.json().get("content_uri")
 
@@ -248,20 +255,18 @@ if __name__ == "__main__":
             "subtitles": ["Français", "English"]
         }
     }
-    
-    # CORRECTION: Télécharger l'image avant de l'envoyer
+
     image_url = "https://image.tmdb.org/t/p/w342/t1i10ptOivG4hV7erkX3tmKpiqm.jpg"
     local_image_path = None
-    
+
     try:
-        # Créer un fichier temporaire pour l'image
         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp_file:
             response = requests.get(image_url, stream=True)
             response.raise_for_status()
             for chunk in response.iter_content(chunk_size=8192):
                 tmp_file.write(chunk)
             local_image_path = tmp_file.name
-        
+
         logging.info(f"Image downloaded to temporary path: {local_image_path}")
 
         options = {
@@ -273,11 +278,11 @@ if __name__ == "__main__":
             logging.info(f"Response Status Code: {response.status_code}")
         else:
             logging.error("Failed to send message")
-            
+
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to download image from URL {image_url}: {e}")
     finally:
-        # Nettoyer le fichier temporaire
         if local_image_path and os.path.exists(local_image_path):
             os.remove(local_image_path)
             logging.info(f"Removed temporary image file: {local_image_path}")
+
