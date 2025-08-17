@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import requests
 import re
+import os
 import logging
 from config.settings import TMDB_API_KEY, LANGUAGE, LANGUAGE2, BASE_URL, JELLYFIN_API_URL, JELLYFIN_API_KEY, JELLYFIN_USER_ID
 
@@ -149,13 +150,14 @@ def is_season_ep_or_movie(media_type: str, title: str) -> str:
             return "serie"
     return None
 
-def analyze_french_version(display_title: str, language_code: str) -> str:
+def analyze_french_version(display_title: str, language_code: str, filename: str = "") -> str:
     """
     Analyzes the display title and language code to determine if it's VFF or VFQ.
 
     Args:
         display_title (str): The display title of the stream (e.g., "Français (TrueFrench) DTS-HD MA 5.1").
         language_code (str): The 3-letter language code (e.g., "fre").
+        filename (str, optional): The filename of the media. Defaults to "".
 
     Returns:
         str: A formatted language label (e.g., "FR (VFF)", "FR (VFQ)", or the original code).
@@ -164,15 +166,15 @@ def analyze_french_version(display_title: str, language_code: str) -> str:
     if lang_code_upper not in ['FRE', 'FRA']:
         return lang_code_upper
 
-    title_lower = (display_title or "").lower()
+    combined_source_text = f"{(display_title or '').lower()} {(filename or '').lower()}"
 
     keywords_vfq = ['vfq', 'fr-ca', 'ca', 'canadian', 'canadien']
     keywords_vff = ['vff', 'truefrench', 'fr-fr', 'european', "vfi", "france"]
 
-    if any(keyword in title_lower for keyword in keywords_vfq):
+    if any(keyword in combined_source_text for keyword in keywords_vfq):
         return "🇨🇦 VFQ"
     
-    if any(keyword in title_lower for keyword in keywords_vff):
+    if any(keyword in combined_source_text for keyword in keywords_vff):
         return "🇫🇷 VFF"
     return "FR"
 
@@ -200,6 +202,8 @@ def get_jellyfin_media_details(item_id: str) -> dict:
         response.raise_for_status()
         data = response.json()
 
+        media_path = data.get('Path', '')
+        filename = os.path.basename(media_path) if media_path else ""
         media_streams = data.get('MediaStreams', [])
         if not media_streams:
             return {}
@@ -239,7 +243,8 @@ def get_jellyfin_media_details(item_id: str) -> dict:
             if stream.get('Type') == 'Audio':
                 language_label = analyze_french_version(
                     stream.get('DisplayTitle'), 
-                    stream.get('Language')
+                    stream.get('Language'),
+                    filename
                 )
                 details['audio'].append(language_label)
                 
@@ -248,7 +253,8 @@ def get_jellyfin_media_details(item_id: str) -> dict:
             if stream.get('Type') == 'Subtitle':
                 language_label = analyze_french_version(
                     stream.get('DisplayTitle'), 
-                    stream.get('Language')
+                    stream.get('Language'),
+                    filename
                 )
                 details['subtitles'].append(language_label)
                 
