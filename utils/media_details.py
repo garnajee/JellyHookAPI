@@ -169,7 +169,7 @@ def analyze_french_version(display_title: str, language_code: str, filename: str
     combined_source_text = f"{(display_title or '').lower()} {(filename or '').lower()}"
 
     keywords_vfq = ['vfq', 'fr-ca', 'ca', 'canadian', 'canadien']
-    keywords_vff = ['vff', 'truefrench', 'fr-fr', 'european', "vfi", "france"]
+    keywords_vff = ['vff', 'truefrench', 'fr-fr', 'european', "vfi", "france", "vf2"]
 
     if any(keyword in combined_source_text for keyword in keywords_vfq):
         return "🇨🇦 VFQ"
