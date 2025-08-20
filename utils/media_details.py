@@ -178,6 +178,43 @@ def analyze_french_version(display_title: str, language_code: str, filename: str
         return "🇫🇷 VFF"
     return "FR"
 
+def _get_resolution_label(width: int, height: int) -> str:
+    """
+    Determines the resolution label (e.g., 1080p, 2160p) based on video dimensions.
+    Prioritizes width for common HD formats to correctly handle cinematic aspect ratios.
+
+    Args:
+        width (int): Video width in pixels.
+        height (int): Video height in pixels.
+
+    Returns:
+        str: The resolution label.
+    """
+    if not width and not height:
+        return "N/A"
+
+    # Prioritize width for 4K and 1080p classification, as it's more consistent
+    # for widescreen/cinematic content.
+    if width:
+        if width >= 3800: # Covers 3840x1600, 3840x2160, etc.
+            return "2160p"
+        if width >= 1800: # Covers 1920x800, 1916x1080, etc.
+            return "1080p"
+        if width >= 1200:
+            return "720p"
+    
+    # Fallback to height for other cases or if width is not available
+    if height:
+        if height >= 2100:
+            return "2160p"
+        if height >= 1000:
+            return "1080p"
+        if height >= 700:
+            return "720p"
+        return f"{height}p" # For SD resolutions like 480p
+    
+    return "SD"
+
 def get_jellyfin_media_details(item_id: str) -> dict:
     """
     Get media details from Jellyfin API, with enhanced French version detection.
@@ -219,21 +256,8 @@ def get_jellyfin_media_details(item_id: str) -> dict:
         if video_stream:
             width = video_stream.get('Width')
             height = video_stream.get('Height')
+            details['video']['resolution'] = _get_resolution_label(width, height)
 
-            resolution_label = ""
-            if width == 3840:
-                resolution_label = "2160p"
-            elif width == 1920:
-                resolution_label = "1080p"
-            elif width == 1280:
-                resolution_label = "720p"
-            else:
-                if height:
-                    resolution_label = f"{height}p"
-                else:
-                    resolution_label = "N/A"
-
-            details['video']['resolution'] = resolution_label
             details['video']['codec'] = video_stream.get('Codec', 'N/A').upper()
             if video_stream.get('VideoRange') == 'HDR':
                 details['video']['hdr'] = "HDR"
