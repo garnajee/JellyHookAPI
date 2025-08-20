@@ -53,10 +53,10 @@ def format_message(message: dict) -> str:
                 tech_info_parts.append(subs_str)
 
             if tech_info_parts:
-                message_parts.append(f"\n> {'  •  '.join(tech_info_parts)}")
+                message_parts.append(f"> {'  •  '.join(tech_info_parts)}")
 
         if message.get('description'):
-            message_parts.append(f"\n```{message.get('description')}```")
+            message_parts.append(f"```{message.get('description')}```")
 
         links_section = []
         links = message.get("media_link", {}) or {}
@@ -80,9 +80,9 @@ def format_message(message: dict) -> str:
             #links_section.append(f"• Trailer EN: {trailers[1]}")
 
         if links_section:
-            message_parts.append("\n" + "\n".join(links_section))
+            message_parts.append("\n".join(links_section))
 
-        return "\n".join(message_parts)
+        return "\n\n".join(message_parts)
 
     except Exception as e:
         logging.error(f"Error formatting message for Matrix: {e}", exc_info=True)
