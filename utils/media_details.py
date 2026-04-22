@@ -168,14 +168,24 @@ def analyze_french_version(display_title: str, language_code: str, filename: str
 
     combined_source_text = f"{(display_title or '').lower()} {(filename or '').lower()}"
 
-    keywords_vfq = ['vfq', 'fr-ca', 'ca', 'canadian', 'canadien']
-    keywords_vff = ['vff', 'truefrench', 'fr-fr', 'european', "vfi", "france", "vf2"]
-
-    if any(keyword in combined_source_text for keyword in keywords_vfq):
-        return "🇨🇦 VFQ"
+    # VFF: Version Française de France (TrueFrench)
+    keywords_vff_exact = ['vff', 'vfi', 'fr-fr', 'vf2']
+    keywords_vff_contains = ['truefrench', 'european', 'france']
     
-    if any(keyword in combined_source_text for keyword in keywords_vff):
+    # VFQ: Version Française Québécoise
+    keywords_vfq_exact = ['vfq', 'fr-ca', 'ca']
+    keywords_vfq_contains = ['canadian', 'canadien']
+
+    # Check VFF first as it's often more explicit and to avoid 'ca' in 'dca' matching VFQ
+    if any(re.search(rf'\b{re.escape(k)}\b', combined_source_text) for k in keywords_vff_exact) or \
+       any(k in combined_source_text for k in keywords_vff_contains):
         return "🇫🇷 VFF"
+
+    # Then check VFQ, using word boundaries for short keywords like 'ca' to avoid technical terms like 'dca'
+    if any(re.search(rf'\b{re.escape(k)}\b', combined_source_text) for k in keywords_vfq_exact) or \
+       any(k in combined_source_text for k in keywords_vfq_contains):
+        return "🇨🇦 VFQ"
+
     return "FR"
 
 def _get_resolution_label(width: int, height: int) -> str:
