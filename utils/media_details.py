@@ -240,7 +240,7 @@ def get_jellyfin_media_details(item_id: str) -> dict:
         return {}
 
     headers = {
-        'X-Emby-Token': JELLYFIN_API_KEY
+        'Authorization': f'MediaBrowser Token="{JELLYFIN_API_KEY}"'
     }
     url = f"{JELLYFIN_API_URL}/Users/{JELLYFIN_USER_ID}/Items/{item_id}"
 
